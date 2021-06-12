@@ -13,4 +13,5 @@
     <string name="sudah_punya_akun">Sudah punya akun ? Masuk</string>
     <string name="jabatan">Jabatan</string>
     <string name="nama_lengkap">Nama Lengkap</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
