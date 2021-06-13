@@ -15,4 +15,7 @@
     <string name="nama_lengkap">Nama Lengkap</string>
     <string name="title_activity_maps">Map</string>
     <string name="hadir">Hadir</string>
+    <string name="profil_saya">Profil Saya</string>
+    <string name="tentang_aplikasi">Tentang Aplikasi</string>
+    <string name="ok">OK</string>
 </resources>

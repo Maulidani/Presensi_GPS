@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/itemMenu"
+        android:icon="@drawable/ic_menu"
+        android:orderInCategory="101"
+        android:title="@string/todo"
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/itemAbout"
+                android:icon="@drawable/ic_info"
+                android:title="@string/tentang_aplikasi"
+                app:showAsAction="always|withText" />
+            <item
+                android:id="@+id/itemProfile"
+                android:icon="@drawable/ic_person"
+                android:title="@string/profil_saya"
+                app:showAsAction="always|withText" />
+        </menu>
+    </item>
+
+</menu>
