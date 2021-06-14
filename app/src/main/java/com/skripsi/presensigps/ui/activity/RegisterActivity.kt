@@ -3,6 +3,7 @@ package com.skripsi.presensigps.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
@@ -18,7 +19,7 @@ import retrofit2.Response
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var snackbar: Snackbar
-    private val itemPosition = listOf("manager", "supervisor", "foreman", "leader", "operator")
+    private val itemPosition = listOf("sales", "manager")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,19 +70,17 @@ class RegisterActivity : AppCompatActivity() {
                     val message = response.body()?.message
 
                     if (value.equals("1")) {
-
                         startActivity(
                             Intent(this@RegisterActivity, LoginActivity::class.java)
                                 .putExtra("email", inputEmail)
                                 .putExtra("password", inputPassword)
                                 .putExtra("position", inputPosition)
                         )
-
-                        snackbar = Snackbar.make(
-                            parentRegisterActivity, message.toString(),
-                            Snackbar.LENGTH_SHORT
-                        )
-                        snackbar.show()
+                        Toast.makeText(
+                            this@RegisterActivity,
+                            message.toString(),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } else {
                         snackbar = Snackbar.make(
                             parentRegisterActivity, message.toString(),
@@ -98,8 +97,11 @@ class RegisterActivity : AppCompatActivity() {
                     )
                     snackbar.show()
                 }
-
             })
+    }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        startActivity(Intent(this, LoginActivity::class.java))
     }
 }

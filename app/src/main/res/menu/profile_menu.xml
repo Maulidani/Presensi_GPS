@@ -9,14 +9,14 @@
         app:showAsAction="ifRoom">
         <menu>
             <item
-                android:id="@+id/itemAbout"
-                android:icon="@drawable/ic_info"
-                android:title="@string/tentang_aplikasi"
-                app:showAsAction="always|withText" />
-            <item
                 android:id="@+id/itemProfile"
                 android:icon="@drawable/ic_person"
                 android:title="@string/profil_saya"
+                app:showAsAction="always|withText" />
+            <item
+                android:id="@+id/itemAbout"
+                android:icon="@drawable/ic_info"
+                android:title="@string/tentang_aplikasi"
                 app:showAsAction="always|withText" />
         </menu>
     </item>

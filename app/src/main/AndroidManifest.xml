@@ -32,7 +32,6 @@
         <activity
             android:name=".ui.activity.MapsActivity"
             android:label="@string/title_activity_maps"
-            android:noHistory="true"
             android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.RegisterActivity"

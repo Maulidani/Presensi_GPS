@@ -3,6 +3,7 @@ package com.skripsi.presensigps.ui.activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import com.apotekku.apotekku.session.Constant
 import com.apotekku.apotekku.session.PreferencesHelper
 import com.google.android.material.snackbar.Snackbar
@@ -75,11 +76,8 @@ class LoginActivity : AppCompatActivity() {
                         saveSession(idUser, nameUser, positionUser, emailUser, passwordUser)
                         getOfficeLocation()
 
-                        snackbar = Snackbar.make(
-                            parentLoginActivity, message.toString(),
-                            Snackbar.LENGTH_SHORT
-                        )
-                        snackbar.show()
+                        Toast.makeText(this@LoginActivity, message.toString(), Toast.LENGTH_SHORT)
+                            .show()
 
                     } else {
                         snackbar = Snackbar.make(
@@ -149,8 +147,6 @@ class LoginActivity : AppCompatActivity() {
                 )
                 snackbar.show()
             }
-
         })
-
     }
 }

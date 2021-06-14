@@ -16,6 +16,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -114,7 +116,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         progressDialog = ProgressDialog(this)
         progressDialog.setTitle("Loading")
-        progressDialog.setMessage("Sedang memuat lokasi...")
+        progressDialog.setMessage("Memuat Lokasi...")
         progressDialog.setCancelable(false)
         progressDialog.show()
 
@@ -156,7 +158,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun presence(idUser: String) {
         progressDialogPresence = ProgressDialog(this)
         progressDialogPresence.setTitle("Loading")
-        progressDialogPresence.setMessage("Melakukan Presensi...")
+        progressDialogPresence.setMessage("Mengirim Presensi...")
         progressDialogPresence.setCancelable(false)
         progressDialogPresence.show()
 
@@ -174,16 +176,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                         imgStatus.setImageResource(R.drawable.ic_success)
                         tvStatus.text = "Sukses"
-                        tvKetStatus.text = "Presensi Berhasil, Selamat Bekerja"
+                        tvKetStatus.text = "Presensi Berhasil Terkirim, Selamat Bekerja"
                         btnHadir.visibility = View.INVISIBLE
                         cardDialog.visibility = View.VISIBLE
+                        cardDialog.animation =
+                            AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
 
-                        snackbar = Snackbar.make(
-                            parentMapsActivity,
-                            message.toString(),
-                            Snackbar.LENGTH_SHORT
-                        )
-                        snackbar.show()
                     } else {
                         progressDialogPresence.dismiss()
 
@@ -204,13 +202,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     tvKetStatus.text = "Presensi Gagal, Coba Lagi"
                     btnHadir.visibility = View.INVISIBLE
                     cardDialog.visibility = View.VISIBLE
+                    cardDialog.animation =
+                        AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
 
-                    snackbar = Snackbar.make(
-                        parentMapsActivity,
-                        t.message.toString(),
-                        Snackbar.LENGTH_SHORT
-                    )
-                    snackbar.show()
                 }
 
             })
@@ -327,6 +321,26 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.profile_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.itemProfile -> {
+                startActivity(Intent(this, ProfileActivity::class.java))
+                return true
+            }
+            R.id.itemAbout -> {
+                startActivity(Intent(this, AboutActivity::class.java))
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onStart() {
         super.onStart()
         if (ContextCompat.checkSelfPermission(
@@ -347,23 +361,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         stopLocationUpdates()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.profile_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.itemAbout -> {
-                startActivity(Intent(this, AboutActivity::class.java))
-                return true
-            }
-            R.id.itemProfile -> {
-                startActivity(Intent(this, ProfileActivity::class.java))
-                return true
-            }
+    override fun onResume() {
+        super.onResume()
+        if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN)) {
+            finish()
         }
-        return super.onOptionsItemSelected(item)
     }
 }
