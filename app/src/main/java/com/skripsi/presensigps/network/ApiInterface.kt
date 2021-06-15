@@ -1,12 +1,8 @@
-package com.skripsi.presensigps.api
+package com.skripsi.presensigps.network
 
 import com.skripsi.presensigps.model.DataResponse
-import com.skripsi.presensigps.model.ResultPosition
 import retrofit2.Call
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface ApiInterface {
     @FormUrlEncoded
@@ -26,13 +22,15 @@ interface ApiInterface {
     ): Call<DataResponse>
 
     @FormUrlEncoded
+//    @Headers("Content-Type: application/x-www-form-urlencoded")
     @POST("presence.php")
     fun addPresence(
-        @Field("name") idName: String
+        @Field("name") idName: String,
+        @Field("img") img: String
     ): Call<DataResponse>
 
-    @GET("get_position.php")
-    fun getPosition(): Call<DataResponse>
+//    @GET("get_position.php")
+//    fun getPosition(): Call<DataResponse>
 
     @GET("office_location.php")
     fun getOfficeLocation(): Call<DataResponse>

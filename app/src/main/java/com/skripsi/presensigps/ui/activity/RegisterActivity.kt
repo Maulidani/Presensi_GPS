@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
-import com.skripsi.presensigps.api.ApiClient
+import com.skripsi.presensigps.network.ApiClient
 import com.skripsi.presensigps.model.DataResponse
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_register.*

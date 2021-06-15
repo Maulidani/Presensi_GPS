@@ -1,4 +1,4 @@
-package com.apotekku.apotekku.session
+package com.skripsi.presensigps.utils
 
 class Constant {
     companion object {

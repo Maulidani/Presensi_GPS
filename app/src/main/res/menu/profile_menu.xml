@@ -16,7 +16,7 @@
             <item
                 android:id="@+id/itemAbout"
                 android:icon="@drawable/ic_info"
-                android:title="@string/tentang_aplikasi"
+                android:title="@string/tentang"
                 app:showAsAction="always|withText" />
         </menu>
     </item>

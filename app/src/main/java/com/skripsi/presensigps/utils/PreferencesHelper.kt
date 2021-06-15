@@ -1,13 +1,13 @@
-package com.apotekku.apotekku.session
+package com.skripsi.presensigps.utils
 
 import android.content.Context
 import android.content.SharedPreferences
 
 class PreferencesHelper(context: Context) {
 
-    private val PREFS_NAME = "PREFS_NAME"
+    private val prefName = "PREFS_NAME"
     private var sharedPref: SharedPreferences =
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        context.getSharedPreferences(prefName, Context.MODE_PRIVATE)
     private val editor: SharedPreferences.Editor = sharedPref.edit()
 
     fun put(key: String, value: String) = editor.putString(key, value).apply()

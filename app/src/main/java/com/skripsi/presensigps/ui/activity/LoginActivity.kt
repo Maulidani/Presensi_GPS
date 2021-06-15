@@ -4,11 +4,11 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import com.apotekku.apotekku.session.Constant
-import com.apotekku.apotekku.session.PreferencesHelper
+import com.skripsi.presensigps.utils.Constant
+import com.skripsi.presensigps.utils.PreferencesHelper
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
-import com.skripsi.presensigps.api.ApiClient
+import com.skripsi.presensigps.network.ApiClient
 import com.skripsi.presensigps.model.DataResponse
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_login.inputEmail

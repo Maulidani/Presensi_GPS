@@ -16,14 +16,13 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.apotekku.apotekku.session.Constant
-import com.apotekku.apotekku.session.PreferencesHelper
+import com.skripsi.presensigps.utils.Constant
+import com.skripsi.presensigps.utils.PreferencesHelper
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
@@ -34,7 +33,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
-import com.skripsi.presensigps.api.ApiClient
+import com.skripsi.presensigps.network.ApiClient
 import com.skripsi.presensigps.model.DataResponse
 import kotlinx.android.synthetic.main.activity_maps.*
 import retrofit2.Call
@@ -140,7 +139,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             if (distance <= radius) {
                 btnHadir.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_green))
 
-                presence(sharedPref.getString(Constant.PREF_USER_ID)!!)
+//                presence(sharedPref.getString(Constant.PREF_USER_ID)!!)
 
             } else {
                 btnHadir.setBackgroundColor(Color.GRAY)
@@ -155,60 +154,60 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun presence(idUser: String) {
-        progressDialogPresence = ProgressDialog(this)
-        progressDialogPresence.setTitle("Loading")
-        progressDialogPresence.setMessage("Mengirim Presensi...")
-        progressDialogPresence.setCancelable(false)
-        progressDialogPresence.show()
-
-        ApiClient.instance.addPresence(idUser)
-            .enqueue(object : Callback<DataResponse> {
-                override fun onResponse(
-                    call: Call<DataResponse>,
-                    response: Response<DataResponse>
-                ) {
-                    val value = response.body()?.value
-                    val message = response.body()?.message
-
-                    if (value.equals("1")) {
-                        progressDialogPresence.dismiss()
-
-                        imgStatus.setImageResource(R.drawable.ic_success)
-                        tvStatus.text = "Sukses"
-                        tvKetStatus.text = "Presensi Berhasil Terkirim, Selamat Bekerja"
-                        btnHadir.visibility = View.INVISIBLE
-                        cardDialog.visibility = View.VISIBLE
-                        cardDialog.animation =
-                            AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
-
-                    } else {
-                        progressDialogPresence.dismiss()
-
-                        snackbar = Snackbar.make(
-                            parentMapsActivity,
-                            message.toString(),
-                            Snackbar.LENGTH_SHORT
-                        )
-                        snackbar.show()
-                    }
-                }
-
-                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
-                    progressDialogPresence.dismiss()
-
-                    imgStatus.setImageResource(R.drawable.ic_failed)
-                    tvStatus.text = "Gagal"
-                    tvKetStatus.text = "Presensi Gagal, Coba Lagi"
-                    btnHadir.visibility = View.INVISIBLE
-                    cardDialog.visibility = View.VISIBLE
-                    cardDialog.animation =
-                        AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
-
-                }
-
-            })
-    }
+//    private fun presence(idUser: String) {
+//        progressDialogPresence = ProgressDialog(this)
+//        progressDialogPresence.setTitle("Loading")
+//        progressDialogPresence.setMessage("Mengirim Presensi...")
+//        progressDialogPresence.setCancelable(false)
+//        progressDialogPresence.show()
+//
+//        ApiClient.instance.addPresence(idUser)
+//            .enqueue(object : Callback<DataResponse> {
+//                override fun onResponse(
+//                    call: Call<DataResponse>,
+//                    response: Response<DataResponse>
+//                ) {
+//                    val value = response.body()?.value
+//                    val message = response.body()?.message
+//
+//                    if (value.equals("1")) {
+//                        progressDialogPresence.dismiss()
+//
+//                        imgStatus.setImageResource(R.drawable.ic_success)
+//                        tvStatus.text = "Sukses"
+//                        tvKetStatus.text = "Presensi Berhasil Terkirim, Selamat Bekerja"
+//                        btnHadir.visibility = View.INVISIBLE
+//                        cardDialog.visibility = View.VISIBLE
+//                        cardDialog.animation =
+//                            AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
+//
+//                    } else {
+//                        progressDialogPresence.dismiss()
+//
+//                        snackbar = Snackbar.make(
+//                            parentMapsActivity,
+//                            message.toString(),
+//                            Snackbar.LENGTH_SHORT
+//                        )
+//                        snackbar.show()
+//                    }
+//                }
+//
+//                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+//                    progressDialogPresence.dismiss()
+//
+//                    imgStatus.setImageResource(R.drawable.ic_failed)
+//                    tvStatus.text = "Gagal"
+//                    tvKetStatus.text = "Presensi Gagal, Coba Lagi"
+//                    btnHadir.visibility = View.INVISIBLE
+//                    cardDialog.visibility = View.VISIBLE
+//                    cardDialog.animation =
+//                        AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
+//
+//                }
+//
+//            })
+//    }
 
     private fun setLatLng(latitude: Double, longitude: Double) {
 
