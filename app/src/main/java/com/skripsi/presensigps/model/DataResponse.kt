@@ -17,11 +17,19 @@ data class DataResponse(
     val longitude: String,
     val radius: String,
 
-    //response position/jabatan
-    val result: ArrayList<ResultPosition>
+    //response Presence
+    val result: ArrayList<Result>
 
 )
 
-data class ResultPosition(
-    val position: String
+data class Result(
+    val id: String,
+    val office: String,
+    val name: String,
+    val img: String,
+    val date: String,
+    val time: String,
+    val status: String,
+
+    var expendable: Boolean = false
 )

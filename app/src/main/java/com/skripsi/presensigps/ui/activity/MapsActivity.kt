@@ -2,21 +2,27 @@ package com.skripsi.presensigps.ui.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -35,10 +41,12 @@ import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
 import com.skripsi.presensigps.network.ApiClient
 import com.skripsi.presensigps.model.DataResponse
+import kotlinx.android.synthetic.main.activity_about.*
 import kotlinx.android.synthetic.main.activity_maps.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.ByteArrayOutputStream
 
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -59,6 +67,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private var longOffice: Double? = null
     private var radius: Double = 0.0
     private var distance: Float = 0.1f
+
+    private val CAMERA_PERMISSION_CODE = 1
+    private lateinit var resultLauncher: ActivityResultLauncher<Intent>
+    private var thumbNail: Bitmap? = null
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResultCallback: LocationResult) {
@@ -138,8 +150,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         btnHadir.setOnClickListener {
             if (distance <= radius) {
                 btnHadir.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_green))
-
-//                presence(sharedPref.getString(Constant.PREF_USER_ID)!!)
+                openCamera()
 
             } else {
                 btnHadir.setBackgroundColor(Color.GRAY)
@@ -153,61 +164,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
     }
-
-//    private fun presence(idUser: String) {
-//        progressDialogPresence = ProgressDialog(this)
-//        progressDialogPresence.setTitle("Loading")
-//        progressDialogPresence.setMessage("Mengirim Presensi...")
-//        progressDialogPresence.setCancelable(false)
-//        progressDialogPresence.show()
-//
-//        ApiClient.instance.addPresence(idUser)
-//            .enqueue(object : Callback<DataResponse> {
-//                override fun onResponse(
-//                    call: Call<DataResponse>,
-//                    response: Response<DataResponse>
-//                ) {
-//                    val value = response.body()?.value
-//                    val message = response.body()?.message
-//
-//                    if (value.equals("1")) {
-//                        progressDialogPresence.dismiss()
-//
-//                        imgStatus.setImageResource(R.drawable.ic_success)
-//                        tvStatus.text = "Sukses"
-//                        tvKetStatus.text = "Presensi Berhasil Terkirim, Selamat Bekerja"
-//                        btnHadir.visibility = View.INVISIBLE
-//                        cardDialog.visibility = View.VISIBLE
-//                        cardDialog.animation =
-//                            AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
-//
-//                    } else {
-//                        progressDialogPresence.dismiss()
-//
-//                        snackbar = Snackbar.make(
-//                            parentMapsActivity,
-//                            message.toString(),
-//                            Snackbar.LENGTH_SHORT
-//                        )
-//                        snackbar.show()
-//                    }
-//                }
-//
-//                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
-//                    progressDialogPresence.dismiss()
-//
-//                    imgStatus.setImageResource(R.drawable.ic_failed)
-//                    tvStatus.text = "Gagal"
-//                    tvKetStatus.text = "Presensi Gagal, Coba Lagi"
-//                    btnHadir.visibility = View.INVISIBLE
-//                    cardDialog.visibility = View.VISIBLE
-//                    cardDialog.animation =
-//                        AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
-//
-//                }
-//
-//            })
-//    }
 
     private fun setLatLng(latitude: Double, longitude: Double) {
 
@@ -318,7 +274,94 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 checkSettingAndStartLocationUpdates()
             }
         }
+
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                resultLauncher.launch(intent)
+            }
+        }
     }
+
+    private fun presence(idUser: String, imgString: String) {
+        progressDialogPresence = ProgressDialog(this)
+        progressDialogPresence.setTitle("Loading")
+        progressDialogPresence.setMessage("Mengirim Presensi...")
+        progressDialogPresence.setCancelable(false)
+        progressDialogPresence.show()
+
+        ApiClient.instance.addPresence(idUser, imgString)
+            .enqueue(object : Callback<DataResponse> {
+                override fun onResponse(
+                    call: Call<DataResponse>,
+                    response: Response<DataResponse>
+                ) {
+                    val value = response.body()?.value
+                    val message = response.body()?.message
+
+                    if (value.equals("1")) {
+                        progressDialogPresence.dismiss()
+
+                        imgStatus.setImageResource(R.drawable.ic_success)
+                        tvStatus.text = "Sukses"
+                        tvKetStatus.text = "Presensi Berhasil Terkirim, Selamat Bekerja"
+                        btnHadir.visibility = View.INVISIBLE
+                        cardDialog.visibility = View.VISIBLE
+                        cardDialog.animation =
+                            AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
+
+                    } else {
+                        progressDialogPresence.dismiss()
+
+                        snackbar = Snackbar.make(
+                            parentMapsActivity,
+                            message.toString(),
+                            Snackbar.LENGTH_SHORT
+                        )
+                        snackbar.show()
+                    }
+                }
+
+                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                    progressDialogPresence.dismiss()
+
+                    imgStatus.setImageResource(R.drawable.ic_failed)
+                    tvStatus.text = "Gagal"
+                    tvKetStatus.text = "Presensi Gagal, Coba Lagi"
+                    btnHadir.visibility = View.INVISIBLE
+                    cardDialog.visibility = View.VISIBLE
+                    cardDialog.animation =
+                        AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
+
+                }
+
+            })
+    }
+
+    private fun openCamera() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            resultLauncher.launch(intent)
+
+        } else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE
+            )
+        }
+    }
+
+    private fun convertToString(): String {
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        thumbNail?.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        val imgByte = byteArrayOutputStream.toByteArray()
+        return Base64.encodeToString(imgByte, Base64.DEFAULT)
+    }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
@@ -353,6 +396,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             askLocationPermission()
         }
 
+        // register camera
+        resultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == Activity.RESULT_OK) {
+                    val data = it.data
+                    thumbNail = data?.extras?.get("data") as Bitmap
+                }
+            }
     }
 
     override fun onStop() {
@@ -365,5 +416,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN)) {
             finish()
         }
+
+        if (thumbNail != null) {
+            val imgString = convertToString()
+            presence(sharedPref.getString(Constant.PREF_USER_ID)!!, imgString)
+
+            Log.e("onResume: ", imgString)
+        }
     }
+
 }

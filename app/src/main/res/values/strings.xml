@@ -19,4 +19,8 @@
     <string name="tentang">Tentang</string>
     <string name="ok">OK</string>
     <string name="keluar">Keluar</string>
+    <string name="title_activity_admin">AdminActivity</string>
+    <string name="telat">Telat</string>
+    <string name="verifikasi">Verifikasi ?</string>
+    <string name="telah_diverifikasi">Telah diverifikasi</string>
 </resources>

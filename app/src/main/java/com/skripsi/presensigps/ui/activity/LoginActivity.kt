@@ -74,7 +74,23 @@ class LoginActivity : AppCompatActivity() {
                         val passwordUser = response.body()?.password
 
                         saveSession(idUser, nameUser, positionUser, emailUser, passwordUser)
-                        getOfficeLocation()
+
+                        when (positionUser) {
+                            "admin" -> startActivity(
+                                Intent(
+                                    this@LoginActivity,
+                                    AdminActivity::class.java
+                                )
+                            )
+                            "manager" -> startActivity(
+                                Intent(
+                                    this@LoginActivity,
+                                    AdminActivity::class.java
+                                )
+                            ) //check after this
+
+                            "sales" -> getOfficeLocation()
+                        }
 
                         Toast.makeText(this@LoginActivity, message.toString(), Toast.LENGTH_SHORT)
                             .show()
@@ -119,7 +135,7 @@ class LoginActivity : AppCompatActivity() {
         ApiClient.instance.getOfficeLocation().enqueue(object : Callback<DataResponse> {
             override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
                 val value = response.body()?.value
-//                val message = response.body()?.message
+                val message = response.body()?.message
 
                 if (value.equals("1")) {
 
@@ -137,15 +153,17 @@ class LoginActivity : AppCompatActivity() {
                     )
 
                     startActivity(Intent(this@LoginActivity, MapsActivity::class.java))
+                } else {
+                    sharedPref.logout()
+                    Toast.makeText(this@LoginActivity, message.toString(), Toast.LENGTH_SHORT)
+                        .show()
                 }
             }
 
             override fun onFailure(call: Call<DataResponse>, t: Throwable) {
-                snackbar = Snackbar.make(
-                    parentLoginActivity, t.message.toString(),
-                    Snackbar.LENGTH_SHORT
-                )
-                snackbar.show()
+                sharedPref.logout()
+                Toast.makeText(this@LoginActivity, t.message.toString(), Toast.LENGTH_SHORT)
+                    .show()
             }
         })
     }

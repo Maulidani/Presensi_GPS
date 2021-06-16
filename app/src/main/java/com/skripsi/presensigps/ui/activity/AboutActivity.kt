@@ -83,7 +83,6 @@ class AboutActivity : AppCompatActivity() {
                     } else {
                         Toast.makeText(this@AboutActivity, message.toString(), Toast.LENGTH_SHORT)
                             .show()
-
                     }
                 }
 
