@@ -30,8 +30,26 @@ class LoginActivity : AppCompatActivity() {
 
         sharedPref = PreferencesHelper(this)
 
+        val position = sharedPref.getString(Constant.PREF_USER_POSITION)
+
         if (sharedPref.getBoolean(Constant.PREF_IS_LOGIN)) {
-            startActivity(Intent(this, MapsActivity::class.java))
+            if (position == "admin" || position == "manager") {
+                startActivity(
+                    Intent(
+                        this@LoginActivity,
+                        AdminActivity::class.java
+                    )
+                )
+            } else if (position == "sales") {
+                startActivity(
+                    Intent(
+                        this@LoginActivity,
+                        MapsActivity::class.java
+                    )
+                )
+            } else {
+                sharedPref.logout()
+            }
         }
 
         val emailFromRegister = intent.getStringExtra("email")
@@ -75,21 +93,17 @@ class LoginActivity : AppCompatActivity() {
 
                         saveSession(idUser, nameUser, positionUser, emailUser, passwordUser)
 
-                        when (positionUser) {
-                            "admin" -> startActivity(
+                        if (positionUser == "admin" || positionUser == "manager") {
+                            startActivity(
                                 Intent(
                                     this@LoginActivity,
                                     AdminActivity::class.java
                                 )
                             )
-                            "manager" -> startActivity(
-                                Intent(
-                                    this@LoginActivity,
-                                    AdminActivity::class.java
-                                )
-                            ) //check after this
-
-                            "sales" -> getOfficeLocation()
+                        } else if (positionUser == "sales") {
+                            getOfficeLocation()
+                        } else {
+                            sharedPref.logout()
                         }
 
                         Toast.makeText(this@LoginActivity, message.toString(), Toast.LENGTH_SHORT)

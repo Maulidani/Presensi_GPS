@@ -112,6 +112,18 @@
                 app:layout_constraintTop_toTopOf="@id/tvDate"
                 tools:text="12:00:00" />
 
+            <TextView
+                android:id="@+id/tvVerifikasi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/verifikasi"
+                android:textSize="12sp"
+                android:textStyle="italic"
+                app:layout_constraintBottom_toBottomOf="@id/btnVerifikasi"
+                app:layout_constraintRight_toRightOf="@id/btnVerifikasi"
+                app:layout_constraintTop_toBottomOf="@id/tvDate"
+                app:layout_constraintTop_toTopOf="@id/btnVerifikasi" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnVerifikasi"
                 android:layout_width="wrap_content"

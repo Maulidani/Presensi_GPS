@@ -13,6 +13,8 @@ import com.skripsi.presensigps.R
 import com.skripsi.presensigps.model.DataResponse
 import com.skripsi.presensigps.model.Result
 import com.skripsi.presensigps.network.ApiClient
+import com.skripsi.presensigps.utils.Constant
+import com.skripsi.presensigps.utils.PreferencesHelper
 import kotlinx.android.synthetic.main.item_presence.view.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -20,11 +22,21 @@ import retrofit2.Response
 
 class PresenceAdapter(private val presenceList: ArrayList<Result>) :
     RecyclerView.Adapter<PresenceAdapter.PresenceViewHolder>() {
+    private lateinit var sharedPref: PreferencesHelper
+    var positions: String? = null
 
     inner class PresenceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         @SuppressLint("UseCompatLoadingForDrawables")
         fun bind(dataResult: Result) {
+            sharedPref = PreferencesHelper(itemView.context)
+
+            positions = sharedPref.getString(Constant.PREF_USER_POSITION)
+
+            if (positions == "manager") {
+                itemView.btnVerifikasi.visibility = View.INVISIBLE
+            }
+
             itemView.tvName.text = dataResult.name
             itemView.tvName2.text = dataResult.name
             Glide.with(itemView)
@@ -37,6 +49,7 @@ class PresenceAdapter(private val presenceList: ArrayList<Result>) :
             if (dataResult.expendable) {
                 itemView.parentDetails.visibility = View.VISIBLE
                 itemView.icDetails.setImageResource(R.drawable.ic_up)
+
             } else {
                 itemView.parentDetails.visibility = View.GONE
                 itemView.icDetails.setImageResource(R.drawable.ic_down)
@@ -49,12 +62,21 @@ class PresenceAdapter(private val presenceList: ArrayList<Result>) :
             }
 
             if (dataResult.expendable && dataResult.status == "0") {
+                itemView.tvVerifikasi.text = itemView.context.getString(R.string.not_verifikasi)
                 itemView.btnVerifikasi.text = itemView.context.getString(R.string.verifikasi)
                 itemView.btnVerifikasi.setTextColor(Color.BLACK)
+                itemView.tvVerifikasi.setTextColor(Color.BLACK)
             } else {
+                itemView.tvVerifikasi.text = itemView.context.getString(R.string.telah_diverifikasi)
                 itemView.btnVerifikasi.text =
                     itemView.context.getString(R.string.telah_diverifikasi)
                 itemView.btnVerifikasi.setTextColor(
+                    ContextCompat.getColor(
+                        itemView.context,
+                        R.color.dark_green
+                    )
+                )
+                itemView.tvVerifikasi.setTextColor(
                     ContextCompat.getColor(
                         itemView.context,
                         R.color.dark_green

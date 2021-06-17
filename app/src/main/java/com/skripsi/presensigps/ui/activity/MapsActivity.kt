@@ -320,6 +320,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         )
                         snackbar.show()
                     }
+
+                    thumbNail = null
                 }
 
                 override fun onFailure(call: Call<DataResponse>, t: Throwable) {
@@ -333,6 +335,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     cardDialog.animation =
                         AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
 
+                    thumbNail = null
                 }
 
             })

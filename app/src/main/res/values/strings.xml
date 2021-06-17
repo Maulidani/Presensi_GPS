@@ -22,5 +22,6 @@
     <string name="title_activity_admin">AdminActivity</string>
     <string name="telat">Telat</string>
     <string name="verifikasi">Verifikasi ?</string>
+    <string name="not_verifikasi">Belum diverifikasi</string>
     <string name="telah_diverifikasi">Telah diverifikasi</string>
 </resources>
