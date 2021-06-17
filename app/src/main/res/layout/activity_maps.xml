@@ -14,16 +14,34 @@
         android:layout_height="match_parent" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnHadir"
-        android:layout_width="match_parent"
+        android:id="@+id/btnReport"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="6dp"
+        android:backgroundTint="@color/yellow"
+        android:text="@string/laporan"
+        map:cornerRadius="12dp"
+        map:layout_constraintBottom_toBottomOf="@id/btnPresent"
+        map:layout_constraintLeft_toLeftOf="parent"
+        map:layout_constraintRight_toLeftOf="@id/btnPresent"
+        map:layout_constraintTop_toTopOf="@id/btnPresent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnPresent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="55dp"
         android:backgroundTint="@color/gray"
+        android:drawableEnd="@drawable/ic_camera"
         android:paddingVertical="12dp"
         android:text="@string/hadir"
         map:cornerRadius="12dp"
-        map:layout_constraintBottom_toBottomOf="parent" />
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintLeft_toRightOf="@id/btnReport"
+        map:layout_constraintRight_toRightOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardDialog"
@@ -32,8 +50,8 @@
         android:layout_gravity="center"
         android:layout_marginHorizontal="32dp"
         android:backgroundTint="@color/light_gray"
-        map:cardCornerRadius="16dp"
         android:visibility="invisible"
+        map:cardCornerRadius="16dp"
         map:layout_constraintBottom_toBottomOf="parent"
         map:layout_constraintTop_toTopOf="parent">
 
@@ -90,6 +108,121 @@
                 map:strokeWidth="1dp" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardReport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="50dp"
+        android:visibility="invisible"
+        map:cardCornerRadius="24dp"
+        map:cardElevation="12dp"
+        map:layout_constraintBottom_toBottomOf="parent"
+        map:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/parentFormLogin"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="24dp">
+
+            <TextView
+                android:id="@+id/tvReport"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/kirim_laporan"
+                android:textColor="@color/dark_green"
+                android:textSize="24sp"
+                map:layout_constraintLeft_toLeftOf="parent"
+                map:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/locationTextField"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="@string/lokasi"
+                map:layout_constraintTop_toBottomOf="@+id/tvReport">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputLocation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/tvMyLatitude"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="12dp"
+                android:textSize="10sp"
+                map:layout_constraintLeft_toLeftOf="parent"
+                map:layout_constraintRight_toLeftOf="@id/tvMyLongitude"
+                map:layout_constraintTop_toBottomOf="@id/locationTextField"
+                tools:ignore="SmallSp"
+                tools:text="latitude" />
+
+            <TextView
+                android:id="@+id/tvMyLongitude"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:textSize="10sp"
+                map:layout_constraintBottom_toBottomOf="@id/tvMyLatitude"
+                map:layout_constraintLeft_toRightOf="@id/tvMyLatitude"
+                map:layout_constraintRight_toRightOf="parent"
+                map:layout_constraintTop_toTopOf="@id/tvMyLatitude"
+                tools:ignore="SmallSp"
+                tools:text="langitude" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/notesTextField"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="@string/catatan"
+                map:errorEnabled="true"
+                map:layout_constraintTop_toBottomOf="@id/tvMyLatitude">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/inputNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:lines="5"
+                    android:maxLines="5" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSendReport"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                android:drawableEnd="@drawable/ic_camera"
+                android:text="@string/kirim"
+                map:layout_constraintBottom_toBottomOf="parent"
+                map:layout_constraintRight_toRightOf="parent"
+                map:layout_constraintTop_toBottomOf="@id/notesTextField" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:backgroundTint="@color/gray"
+                android:text="@string/batal"
+                map:layout_constraintBottom_toBottomOf="@id/btnSendReport"
+                map:layout_constraintRight_toLeftOf="@+id/btnSendReport"
+                map:layout_constraintTop_toTopOf="@id/btnSendReport" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

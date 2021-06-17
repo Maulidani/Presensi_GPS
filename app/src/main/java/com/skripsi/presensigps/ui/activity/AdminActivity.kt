@@ -6,10 +6,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayoutMediator
 import com.skripsi.presensigps.R
-import com.skripsi.presensigps.adapter.PresenceAdapter
 import com.skripsi.presensigps.adapter.ViewPagerAdapter
 import com.skripsi.presensigps.utils.Constant
 import com.skripsi.presensigps.utils.PreferencesHelper

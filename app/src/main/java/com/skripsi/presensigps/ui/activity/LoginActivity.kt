@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.skripsi.presensigps.ui.activity
 
+import android.app.ProgressDialog
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -21,12 +24,18 @@ import retrofit2.Response
 class LoginActivity : AppCompatActivity() {
     private lateinit var sharedPref: PreferencesHelper
     private lateinit var snackbar: Snackbar
+    private lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
         supportActionBar?.hide()
         supportActionBar?.title = "Masuk"
+
+        progressDialog = ProgressDialog(this)
+        progressDialog.setTitle("Masuk")
+        progressDialog.setMessage("Memuat Informasi...")
+        progressDialog.setCancelable(false)
 
         sharedPref = PreferencesHelper(this)
 
@@ -75,6 +84,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginUser(inputEmail: String, inputPassword: String) {
+        progressDialog.show()
+
         ApiClient.instance.loginUser(inputEmail, inputPassword)
             .enqueue(object : Callback<DataResponse> {
                 override fun onResponse(
@@ -94,22 +105,29 @@ class LoginActivity : AppCompatActivity() {
                         saveSession(idUser, nameUser, positionUser, emailUser, passwordUser)
 
                         if (positionUser == "admin" || positionUser == "manager") {
+                            progressDialog.dismiss()
+
                             startActivity(
                                 Intent(
                                     this@LoginActivity,
                                     AdminActivity::class.java
                                 )
                             )
+
+                            Toast.makeText(this@LoginActivity, message.toString(), Toast.LENGTH_SHORT)
+                                .show()
+
                         } else if (positionUser == "sales") {
                             getOfficeLocation()
+
                         } else {
+                            progressDialog.dismiss()
                             sharedPref.logout()
                         }
 
-                        Toast.makeText(this@LoginActivity, message.toString(), Toast.LENGTH_SHORT)
-                            .show()
-
                     } else {
+                        progressDialog.dismiss()
+
                         snackbar = Snackbar.make(
                             parentLoginActivity, message.toString(),
                             Snackbar.LENGTH_SHORT
@@ -119,6 +137,8 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                    progressDialog.dismiss()
+
                     snackbar = Snackbar.make(
                         parentLoginActivity, t.message.toString(),
                         Snackbar.LENGTH_SHORT
@@ -152,7 +172,12 @@ class LoginActivity : AppCompatActivity() {
                 val message = response.body()?.message
 
                 if (value.equals("1")) {
+                    progressDialog.dismiss()
 
+                    sharedPref.put(
+                        Constant.PREF_OFFICE_NAME,
+                        response.body()?.name.toString()
+                    )
                     sharedPref.put(
                         Constant.PREF_OFFICE_LATITUDE,
                         response.body()?.latitude.toString()
@@ -166,16 +191,23 @@ class LoginActivity : AppCompatActivity() {
                         response.body()?.radius.toString()
                     )
 
+                    Toast.makeText(this@LoginActivity, message.toString(), Toast.LENGTH_SHORT)
+                        .show()
+
                     startActivity(Intent(this@LoginActivity, MapsActivity::class.java))
                 } else {
+                    progressDialog.dismiss()
                     sharedPref.logout()
+
                     Toast.makeText(this@LoginActivity, message.toString(), Toast.LENGTH_SHORT)
                         .show()
                 }
             }
 
             override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                progressDialog.dismiss()
                 sharedPref.logout()
+
                 Toast.makeText(this@LoginActivity, t.message.toString(), Toast.LENGTH_SHORT)
                     .show()
             }

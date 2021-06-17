@@ -24,4 +24,18 @@
     <string name="verifikasi">Verifikasi ?</string>
     <string name="not_verifikasi">Belum diverifikasi</string>
     <string name="telah_diverifikasi">Telah diverifikasi</string>
+    <string name="nama">Nama</string>
+    <string name="presensi_berhasil">Presensi Berhasil Terkirim, Selamat Bekerja</string>
+    <string name="presensi_gagal">Presensi Gagal, Terjadi Kesalahan</string>
+    <string name="success">SUKSES</string>
+    <string name="gagal">GAGAL</string>
+    <string name="laporan">Laporan</string>
+    <string name="kirim_laporan">Kirim Laporan</string>
+    <string name="foto">Foto</string>
+    <string name="kirim">Kirim</string>
+    <string name="catatan">Catatan</string>
+    <string name="lokasi">Lokasi</string>
+    <string name="batal">Batal</string>
+    <string name="profil">Profil</string>
+    <string name="x">X</string>
 </resources>

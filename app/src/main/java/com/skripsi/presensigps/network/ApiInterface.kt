@@ -30,8 +30,27 @@ interface ApiInterface {
     ): Call<DataResponse>
 
     @FormUrlEncoded
+//    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @POST("sales_report.php")
+    fun addReport(
+        @Field("name") idName: String,
+        @Field("location_name") locName: String,
+        @Field("latitude") latitude: String,
+        @Field("longitude") longitude: String,
+        @Field("img") img: String,
+        @Field("notes") notes: String
+    ): Call<DataResponse>
+
+    @FormUrlEncoded
     @POST("presence_verification.php")
     fun verificationPresence(
+        @Field("id") id: String,
+        @Field("status") status: String
+    ): Call<DataResponse>
+
+    @FormUrlEncoded
+    @POST("report_verification.php")
+    fun verificationReport(
         @Field("id") id: String,
         @Field("status") status: String
     ): Call<DataResponse>
@@ -44,5 +63,8 @@ interface ApiInterface {
 
     @GET("get_presence.php")
     fun getPresence(): Call<DataResponse>
+
+    @GET("get_sales_report.php")
+    fun getReport(): Call<DataResponse>
 
 }

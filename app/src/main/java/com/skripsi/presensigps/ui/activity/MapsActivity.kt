@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.skripsi.presensigps.ui.activity
 
 import android.Manifest
@@ -27,8 +29,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.skripsi.presensigps.utils.Constant
-import com.skripsi.presensigps.utils.PreferencesHelper
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
@@ -39,9 +39,12 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
-import com.skripsi.presensigps.network.ApiClient
 import com.skripsi.presensigps.model.DataResponse
+import com.skripsi.presensigps.network.ApiClient
+import com.skripsi.presensigps.utils.Constant
+import com.skripsi.presensigps.utils.PreferencesHelper
 import kotlinx.android.synthetic.main.activity_about.*
+import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_maps.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -63,33 +66,47 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationResult: LocationResult
 
+    private var myLocLatitude: Double? = null
+    private var myLocLongitude: Double? = null
+
     private var latOffice: Double? = null
     private var longOffice: Double? = null
     private var radius: Double = 0.0
     private var distance: Float = 0.1f
 
-    private val CAMERA_PERMISSION_CODE = 1
+    private val cameraPermissionCode = 1
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private var thumbNail: Bitmap? = null
+
+    private var typeOnCLick: String? = null
+    private var getInputLocationName: String? = null
+    private var getMyLocLatitude: String? = null
+    private var getMyLocLongitude: String? = null
+    private var getInputNotes: String? = null
 
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResultCallback: LocationResult) {
             progressDialog.dismiss()
             locationResult = locationResultCallback
 
+            myLocLatitude = locationResult.locations[0].latitude
+            myLocLongitude = locationResult.locations[0].longitude
+            tvMyLatitude.text = myLocLatitude.toString()
+            tvMyLongitude.text = myLocLongitude.toString()
+
             Log.e(
                 tag,
-                "onLocationResult: latitude = ${locationResult.locations[0].latitude}" +
-                        " \n longitud0 = ${locationResult.locations[0].longitude}"
+                "onLocationResult: latitude = $myLocLatitude" +
+                        " \n longitud0 = $myLocLongitude"
             )
 
-            btnHadir.setBackgroundColor(Color.GRAY)
+            btnPresent.setBackgroundColor(Color.GRAY)
             if (distance <= radius) {
                 Log.e(
                     tag,
                     "onLocationResult: $distance <= $radius"
                 )
-                btnHadir.setBackgroundColor(
+                btnPresent.setBackgroundColor(
                     ContextCompat.getColor(
                         applicationContext,
                         R.color.dark_green
@@ -100,12 +117,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     tag,
                     "onLocationResult: $distance <= $radius"
                 )
-                btnHadir.setBackgroundColor(Color.GRAY)
+                btnPresent.setBackgroundColor(Color.GRAY)
             }
 
             setLatLng(
-                locationResult.locations[0].latitude,
-                locationResult.locations[0].longitude
+                myLocLatitude!!, myLocLongitude!!
             )
         }
     }
@@ -144,20 +160,57 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         btnOk.setOnClickListener {
             cardDialog.visibility = View.INVISIBLE
-            btnHadir.visibility = View.VISIBLE
+            btnReport.visibility = View.VISIBLE
+            btnPresent.visibility = View.VISIBLE
         }
 
-        btnHadir.setOnClickListener {
+        btnSendReport.setOnClickListener {
+            typeOnCLick = "report"
+            getInputLocationName = inputLocation.text.toString()
+            getMyLocLatitude = tvMyLatitude.text.toString()
+            getMyLocLongitude = tvMyLongitude.text.toString()
+            getInputNotes = inputNotes.text.toString()
+
+            btnReport.visibility = View.VISIBLE
+            btnPresent.visibility = View.VISIBLE
+            when {
+                getInputLocationName == "" -> inputLocation.error = "Tidak boleh kosong"
+                getInputNotes == "" -> inputNotes.error = "Tidak boleh kosong"
+                else -> openCamera()
+            }
+
+        }
+
+        btnCancel.setOnClickListener {
+            cardReport.visibility = View.INVISIBLE
+            btnReport.visibility = View.VISIBLE
+            btnPresent.visibility = View.VISIBLE
+        }
+
+        btnReport.setOnClickListener {
+            btnReport.visibility = View.INVISIBLE
+            btnPresent.visibility = View.INVISIBLE
+            cardReport.visibility = View.VISIBLE
+            cardReport.animation =
+                AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
+            tvMyLatitude.text = myLocLatitude.toString()
+            tvMyLongitude.text = myLocLongitude.toString()
+        }
+
+        btnPresent.setOnClickListener {
+            typeOnCLick = "presence"
+
             if (distance <= radius) {
-                btnHadir.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_green))
+
+                btnPresent.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_green))
                 openCamera()
 
             } else {
-                btnHadir.setBackgroundColor(Color.GRAY)
+                btnPresent.setBackgroundColor(Color.GRAY)
                 snackbar = Snackbar.make(
                     parentMapsActivity,
-                    "Anda Tidak Masuk Diarea,\n" +
-                            "Maksimal Jarak Dari Kantor 50 Meter",
+                    "Anda Tidak Masuk Di Area Kantor,\n" +
+                            "Maksimal Jarak 50 Meter",
                     Snackbar.LENGTH_SHORT
                 )
                 snackbar.show()
@@ -180,7 +233,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.animateCamera(cameraUpdate)
         mMap.clear()
-        mMap.addMarker(MarkerOptions().position(myLocation).title("My Location"))
+        mMap.addMarker(MarkerOptions().position(myLocation).title("Lokasi Saya"))
 
         val circleOptions = CircleOptions()
         circleOptions.center(officeLocation)
@@ -275,7 +328,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        if (requestCode == CAMERA_PERMISSION_CODE) {
+        if (requestCode == cameraPermissionCode) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 resultLauncher.launch(intent)
@@ -303,9 +356,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         progressDialogPresence.dismiss()
 
                         imgStatus.setImageResource(R.drawable.ic_success)
-                        tvStatus.text = "Sukses"
-                        tvKetStatus.text = "Presensi Berhasil Terkirim, Selamat Bekerja"
-                        btnHadir.visibility = View.INVISIBLE
+                        tvStatus.text = applicationContext.getString(R.string.success)
+                        tvKetStatus.text = applicationContext.getString(R.string.presensi_berhasil)
+                        btnReport.visibility = View.INVISIBLE
+                        btnPresent.visibility = View.INVISIBLE
                         cardDialog.visibility = View.VISIBLE
                         cardDialog.animation =
                             AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
@@ -328,9 +382,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     progressDialogPresence.dismiss()
 
                     imgStatus.setImageResource(R.drawable.ic_failed)
-                    tvStatus.text = "Gagal"
-                    tvKetStatus.text = "Presensi Gagal, Coba Lagi"
-                    btnHadir.visibility = View.INVISIBLE
+                    tvStatus.text = applicationContext.getString(R.string.gagal)
+                    tvKetStatus.text = applicationContext.getString(R.string.presensi_gagal)
+                    btnReport.visibility = View.INVISIBLE
+                    btnPresent.visibility = View.INVISIBLE
                     cardDialog.visibility = View.VISIBLE
                     cardDialog.animation =
                         AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
@@ -353,7 +408,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         } else {
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.CAMERA), CAMERA_PERMISSION_CODE
+                arrayOf(Manifest.permission.CAMERA), cameraPermissionCode
             )
         }
     }
@@ -422,10 +477,96 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         if (thumbNail != null) {
             val imgString = convertToString()
-            presence(sharedPref.getString(Constant.PREF_USER_ID)!!, imgString)
+
+            when (typeOnCLick) {
+
+                "presence" -> presence(sharedPref.getString(Constant.PREF_USER_ID)!!, imgString)
+                "report" -> {
+                    report(
+                        sharedPref.getString(Constant.PREF_USER_ID)!!,
+                        getInputLocationName!!,
+                        getMyLocLatitude!!,
+                        getMyLocLongitude!!,
+                        getInputNotes!!,
+                        imgString
+                    )
+
+                }
+
+            }
 
             Log.e("onResume: ", imgString)
         }
     }
 
+    private fun report(
+        idUser: String,
+        getInputLocationName: String,
+        getMyLocLatitude: String,
+        getMyLocLongitude: String,
+        getInputNotes: String,
+        imgString: String
+    ) {
+        progressDialogPresence = ProgressDialog(this)
+        progressDialogPresence.setTitle("Loading")
+        progressDialogPresence.setMessage("Mengirim Laporan...")
+        progressDialogPresence.setCancelable(false)
+
+        ApiClient.instance.addReport(
+            idUser,
+            getInputLocationName,
+            getMyLocLatitude,
+            getMyLocLongitude,
+            imgString,
+            getInputNotes
+        ).enqueue(object : Callback<DataResponse> {
+            override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
+                val value = response.body()?.value
+                val message = response.body()?.message
+
+                if (value.equals("1")) {
+                    cardReport.visibility = View.INVISIBLE
+                    progressDialogPresence.dismiss()
+
+                    imgStatus.setImageResource(R.drawable.ic_success)
+                    tvStatus.text = applicationContext.getString(R.string.success)
+                    tvKetStatus.text = applicationContext.getString(R.string.presensi_berhasil)
+                    btnReport.visibility = View.INVISIBLE
+                    btnPresent.visibility = View.INVISIBLE
+                    cardDialog.visibility = View.VISIBLE
+                    cardDialog.animation =
+                        AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
+
+                } else {
+                    cardReport.visibility = View.INVISIBLE
+                    progressDialogPresence.dismiss()
+
+                    snackbar = Snackbar.make(
+                        parentMapsActivity,
+                        message.toString(),
+                        Snackbar.LENGTH_SHORT
+                    )
+                    snackbar.show()
+                }
+
+                thumbNail = null
+            }
+
+            override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                cardReport.visibility = View.INVISIBLE
+                progressDialogPresence.dismiss()
+
+                imgStatus.setImageResource(R.drawable.ic_failed)
+                tvStatus.text = applicationContext.getString(R.string.gagal)
+                tvKetStatus.text = applicationContext.getString(R.string.presensi_gagal)
+                btnReport.visibility = View.INVISIBLE
+                btnPresent.visibility = View.INVISIBLE
+                cardDialog.visibility = View.VISIBLE
+                cardDialog.animation =
+                    AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
+
+                thumbNail = null
+            }
+        })
+    }
 }

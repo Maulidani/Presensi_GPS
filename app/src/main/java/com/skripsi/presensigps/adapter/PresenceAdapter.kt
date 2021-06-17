@@ -1,6 +1,9 @@
+@file:Suppress("DEPRECATION")
+
 package com.skripsi.presensigps.adapter
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -23,14 +26,20 @@ import retrofit2.Response
 class PresenceAdapter(private val presenceList: ArrayList<Result>) :
     RecyclerView.Adapter<PresenceAdapter.PresenceViewHolder>() {
     private lateinit var sharedPref: PreferencesHelper
-    var positions: String? = null
+    private var positions: String? = null
+    private lateinit var progressDialog: ProgressDialog
+    private val verification = "1"
 
     inner class PresenceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         @SuppressLint("UseCompatLoadingForDrawables")
         fun bind(dataResult: Result) {
-            sharedPref = PreferencesHelper(itemView.context)
+            progressDialog = ProgressDialog(itemView.context)
+            progressDialog.setTitle("Loading")
+            progressDialog.setMessage("Memverifikasi...")
+            progressDialog.setCancelable(false)
 
+            sharedPref = PreferencesHelper(itemView.context)
             positions = sharedPref.getString(Constant.PREF_USER_POSITION)
 
             if (positions == "manager") {
@@ -86,9 +95,7 @@ class PresenceAdapter(private val presenceList: ArrayList<Result>) :
 
             itemView.btnVerifikasi.setOnClickListener {
                 if (dataResult.status == "0") {
-                    val verification = "1"
-                    Toast.makeText(itemView.context, "memverifikasi", Toast.LENGTH_SHORT).show()
-                    presenceVerification(dataResult.id, verification, itemView)
+                    presenceVerification(dataResult.id, itemView)
                 }
             }
 
@@ -115,7 +122,9 @@ class PresenceAdapter(private val presenceList: ArrayList<Result>) :
 
     override fun getItemCount(): Int = presenceList.size
 
-    private fun presenceVerification(id: String, verification: String, itemView: View) {
+    private fun presenceVerification(id: String, itemView: View) {
+        progressDialog.show()
+
         ApiClient.instance.verificationPresence(id, verification)
             .enqueue(object : Callback<DataResponse> {
                 override fun onResponse(
@@ -132,9 +141,11 @@ class PresenceAdapter(private val presenceList: ArrayList<Result>) :
                         Toast.makeText(itemView.context, message.toString(), Toast.LENGTH_SHORT)
                             .show()
                     }
+                    progressDialog.dismiss()
                 }
 
                 override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                    progressDialog.dismiss()
                     Toast.makeText(itemView.context, t.message.toString(), Toast.LENGTH_SHORT)
                         .show()
                 }

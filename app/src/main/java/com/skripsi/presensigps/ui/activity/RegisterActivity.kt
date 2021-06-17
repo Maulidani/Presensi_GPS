@@ -1,5 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.skripsi.presensigps.ui.activity
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
@@ -20,11 +23,17 @@ import retrofit2.Response
 class RegisterActivity : AppCompatActivity() {
     private lateinit var snackbar: Snackbar
     private val itemPosition = listOf("sales", "manager")
+    private lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
         supportActionBar?.title = "Daftar"
+
+        progressDialog = ProgressDialog(this)
+        progressDialog.setTitle("Mendaftar")
+        progressDialog.setMessage("Memuat Informasi...")
+        progressDialog.setCancelable(false)
 
         val adapterPosition = ArrayAdapter(this, R.layout.list_dropdown, itemPosition)
         inputJabatan.setAdapter(adapterPosition)
@@ -60,6 +69,8 @@ class RegisterActivity : AppCompatActivity() {
         inputEmail: String,
         inputPassword: String
     ) {
+        progressDialog.show()
+
         ApiClient.instance.registerUser(inputNamaLengkap, inputEmail, inputPassword, inputPosition)
             .enqueue(object : Callback<DataResponse> {
                 override fun onResponse(
@@ -76,12 +87,16 @@ class RegisterActivity : AppCompatActivity() {
                                 .putExtra("password", inputPassword)
                                 .putExtra("position", inputPosition)
                         )
+                        progressDialog.dismiss()
+
                         Toast.makeText(
                             this@RegisterActivity,
                             message.toString(),
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
+                        progressDialog.dismiss()
+
                         snackbar = Snackbar.make(
                             parentRegisterActivity, message.toString(),
                             Snackbar.LENGTH_SHORT
@@ -91,6 +106,8 @@ class RegisterActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                    progressDialog.dismiss()
+
                     snackbar = Snackbar.make(
                         parentRegisterActivity, t.message.toString(),
                         Snackbar.LENGTH_SHORT

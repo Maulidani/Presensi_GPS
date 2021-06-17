@@ -19,13 +19,16 @@ data class DataResponse(
 
     //response Presence
     val result: ArrayList<Result>
-
 )
 
 data class Result(
     val id: String,
     val office: String,
     val name: String,
+    val location_name: String,
+    val latitude: String,
+    val longitude: String,
+    val notes: String,
     val img: String,
     val date: String,
     val time: String,
