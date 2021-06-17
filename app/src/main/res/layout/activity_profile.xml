@@ -130,28 +130,4 @@
         app:layout_constraintRight_toRightOf="@id/cardFormDaftar"
         app:layout_constraintTop_toBottomOf="@id/cardFormDaftar" />
 
-
-    <!--    <com.google.android.material.textfield.TextInputLayout-->
-    <!--        android:id="@+id/NameTextField"-->
-    <!--        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginTop="32dp"-->
-    <!--        android:hint="Nama"-->
-    <!--        app:endIconMode="password_toggle"-->
-    <!--        android:background="@color/soft_red"-->
-    <!--        app:layout_constraintTop_toBottomOf="@+id/imgProfile">-->
-
-    <!--        <com.google.android.material.textfield.TextInputEditText-->
-    <!--            android:id="@+id/profileName"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:clickable="false"-->
-    <!--            android:enabled="false"-->
-    <!--            android:inputType="textPassword"-->
-    <!--            android:textColor="@color/black" />-->
-
-    <!--    </com.google.android.material.textfield.TextInputLayout>-->
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>
