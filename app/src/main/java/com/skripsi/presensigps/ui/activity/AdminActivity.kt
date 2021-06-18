@@ -20,6 +20,8 @@ class AdminActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin)
+        supportActionBar?.title = sharedPref.getString(Constant.PREF_USER_POSITION).toString()
+
         sharedPref = PreferencesHelper(this)
         if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN)) {
             startActivity(Intent(this, LoginActivity::class.java))
