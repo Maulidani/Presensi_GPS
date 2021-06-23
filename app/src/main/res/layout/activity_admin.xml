@@ -1,29 +1,277 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parentAdminActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/dark_green"
     tools:context=".ui.activity.AdminActivity">
-    <LinearLayout
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/icFace"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="24dp"
+        android:src="@drawable/ic_face"
+        app:layout_constraintBottom_toTopOf="@id/parentDasboard"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginEnd="24dp"
+        android:textAlignment="textEnd"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/icFace"
+        app:layout_constraintTop_toTopOf="@id/icFace"
+        tools:text="Andi Aco" />
+
+    <TextView
+        android:id="@+id/tvEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="@string/admin"
+        android:textAlignment="textEnd"
+        android:textColor="@color/white"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="@id/tvName"
+        app:layout_constraintTop_toBottomOf="@+id/tvName" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/parentDasboard"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_marginTop="130dp"
+        android:background="@drawable/bg_admin"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRefresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="10sp"
+            app:icon="@drawable/ic_refresh"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SmallSp" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardPresence"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="9dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/cardReport"
+            app:layout_constraintTop_toBottomOf="@id/btnRefresh">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/imgIconPresensi"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:contentDescription="@string/todo"
+                    android:src="@drawable/ic_point"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvTotalPresensi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/admin"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toTopOf="@+id/tvPresensi"
+                    app:layout_constraintLeft_toRightOf="@+id/imgIconPresensi"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/imgIconPresensi" />
+
+                <TextView
+                    android:id="@+id/tvPresensi"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/presensi"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@id/imgIconPresensi"
+                    app:layout_constraintLeft_toLeftOf="@+id/tvTotalPresensi"
+                    app:layout_constraintRight_toRightOf="@id/tvTotalPresensi"
+                    app:layout_constraintTop_toBottomOf="@id/tvTotalPresensi" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardReport"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="9dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:layout_constraintBottom_toBottomOf="@id/cardPresence"
+            app:layout_constraintLeft_toRightOf="@id/cardPresence"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/cardPresence">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/imgIconReport"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:contentDescription="@string/todo"
+                    android:src="@drawable/ic_library_book"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvTotalReport"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/admin"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toTopOf="@+id/tvReport"
+                    app:layout_constraintLeft_toRightOf="@+id/imgIconReport"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/imgIconReport" />
+
+                <TextView
+                    android:id="@+id/tvReport"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/laporan"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@id/imgIconReport"
+                    app:layout_constraintLeft_toLeftOf="@+id/tvTotalReport"
+                    app:layout_constraintRight_toRightOf="@id/tvTotalReport"
+                    app:layout_constraintTop_toBottomOf="@id/tvTotalReport" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardUser"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="9dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="12dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/cardMaps"
+            app:layout_constraintTop_toBottomOf="@id/cardPresence">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/imgIconUser"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:contentDescription="@string/todo"
+                    android:src="@drawable/ic_people"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvTotalUser"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/admin"
+                    android:textSize="24sp"
+                    app:layout_constraintBottom_toTopOf="@+id/tvUser"
+                    app:layout_constraintLeft_toRightOf="@+id/imgIconUser"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/imgIconUser" />
+
+                <TextView
+                    android:id="@+id/tvUser"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/akun"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@id/imgIconUser"
+                    app:layout_constraintLeft_toLeftOf="@+id/tvTotalUser"
+                    app:layout_constraintRight_toRightOf="@id/tvTotalUser"
+                    app:layout_constraintTop_toBottomOf="@id/tvTotalUser" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardMaps"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="9dp"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="6dp"
+            app:layout_constraintBottom_toBottomOf="@id/cardUser"
+            app:layout_constraintLeft_toRightOf="@id/cardUser"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@id/cardUser">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="12dp">
+
+                <ImageView
+                    android:id="@+id/imgIconMaps"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:contentDescription="@string/todo"
+                    android:src="@drawable/ic_maps"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tvMaps"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/maps"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="@id/imgIconMaps"
+                    app:layout_constraintLeft_toRightOf="@id/imgIconMaps"
+                    app:layout_constraintTop_toTopOf="@id/imgIconMaps" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <ImageView
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@color/white"
-            app:tabMode="fixed"
-            app:tabSelectedTextColor="@color/dark_green"
-            app:tabTextAppearance="@style/MyTabStyle" />
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewPager"
-            android:background="@color/white"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
-
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:contentDescription="@string/todo"
+            android:src="@drawable/logo_lapi"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

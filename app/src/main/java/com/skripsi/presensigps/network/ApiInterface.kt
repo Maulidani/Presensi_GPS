@@ -67,4 +67,12 @@ interface ApiInterface {
     @GET("get_sales_report.php")
     fun getReport(): Call<DataResponse>
 
+    @GET("get_update_latlng.php")
+    fun getUpdateLatlngReport(
+        @Query("name") name: String
+    ): Call<DataResponse>
+
+    @GET("get_info_admin.php")
+    fun getInfoAdmin(): Call<DataResponse>
+
 }

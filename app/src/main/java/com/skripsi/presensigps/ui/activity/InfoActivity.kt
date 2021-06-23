@@ -1,10 +1,10 @@
-package com.skripsi.presensigps.ui.fragment
+@file:Suppress("DEPRECATION")
 
+package com.skripsi.presensigps.ui.activity
+
+import android.app.ProgressDialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
@@ -12,36 +12,37 @@ import com.skripsi.presensigps.adapter.PresenceAdapter
 import com.skripsi.presensigps.adapter.ReportAdapter
 import com.skripsi.presensigps.model.DataResponse
 import com.skripsi.presensigps.network.ApiClient
-import kotlinx.android.synthetic.main.fragment_report.*
+import kotlinx.android.synthetic.main.activity_info.*
+import kotlinx.android.synthetic.main.fragment_report.rv
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ReportFragment(private var type: String) : Fragment() {
+class InfoActivity : AppCompatActivity() {
     private lateinit var lLayoutManager: LinearLayoutManager
     private lateinit var pAdapter: PresenceAdapter
     private lateinit var rAdapter: ReportAdapter
     private lateinit var snackbar: Snackbar
+    private lateinit var progressDialog: ProgressDialog
+    private lateinit var type: String
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_report, container, false)
-    }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_info)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        type = intent.getStringExtra("type").toString()
+        supportActionBar?.title = type
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        lLayoutManager = LinearLayoutManager(activity)
+        progressDialog = ProgressDialog(this)
+        progressDialog.setTitle("Masuk")
+        progressDialog.setMessage("Memuat Informasi...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
+        lLayoutManager = LinearLayoutManager(this)
         rv.layoutManager = lLayoutManager
         rv.setHasFixedSize(true)
-
-        when (type) {
-            "presence" -> presence()
-            "report" -> report()
-        }
     }
 
     private fun presence() {
@@ -54,23 +55,28 @@ class ReportFragment(private var type: String) : Fragment() {
                     pAdapter = PresenceAdapter(response.body()!!.result)
                     rv.adapter = pAdapter
 
+                    progressDialog.dismiss()
                 } else {
                     snackbar =
-                        Snackbar.make(activity!!.frame, message.toString(), Snackbar.LENGTH_SHORT)
+                        Snackbar.make(parentInfoActivity, message.toString(), Snackbar.LENGTH_SHORT)
                     snackbar.show()
+
+                    progressDialog.dismiss()
                 }
             }
 
             override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                progressDialog.dismiss()
+
                 snackbar =
-                    Snackbar.make(activity!!.frame, t.message.toString(), Snackbar.LENGTH_SHORT)
+                    Snackbar.make(parentInfoActivity, t.message.toString(), Snackbar.LENGTH_SHORT)
                 snackbar.show()
             }
         })
     }
 
     private fun report() {
-        ApiClient.instance.getReport().enqueue(object : Callback<DataResponse>{
+        ApiClient.instance.getReport().enqueue(object : Callback<DataResponse> {
             override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
                 val value = response.body()?.value
                 val message = response.body()?.message
@@ -79,19 +85,33 @@ class ReportFragment(private var type: String) : Fragment() {
                     rAdapter = ReportAdapter(response.body()!!.result)
                     rv.adapter = rAdapter
 
+                    progressDialog.dismiss()
                 } else {
                     snackbar =
-                        Snackbar.make(activity!!.frame, message.toString(), Snackbar.LENGTH_SHORT)
+                        Snackbar.make(parentInfoActivity, message.toString(), Snackbar.LENGTH_SHORT)
                     snackbar.show()
+
+                    progressDialog.dismiss()
                 }
             }
 
             override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                progressDialog.dismiss()
+
                 snackbar =
-                    Snackbar.make(activity!!.frame, t.message.toString(), Snackbar.LENGTH_SHORT)
+                    Snackbar.make(parentInfoActivity, t.message.toString(), Snackbar.LENGTH_SHORT)
                 snackbar.show()
             }
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        when (type) {
+            "presence" -> presence()
+            "report" -> report()
+        }
     }
 
     override fun onResume() {
@@ -100,5 +120,10 @@ class ReportFragment(private var type: String) : Fragment() {
             "presence" -> presence()
             "report" -> report()
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 }

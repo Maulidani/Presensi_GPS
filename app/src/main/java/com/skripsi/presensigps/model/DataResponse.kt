@@ -18,7 +18,14 @@ data class DataResponse(
     val radius: String,
 
     //response Presence
-    val result: ArrayList<Result>
+    val result: ArrayList<Result>,
+
+    //info admin
+    val total_presence: String,
+    val total_report: String,
+    val total_user: String,
+    val time: String
+
 )
 
 data class Result(

@@ -14,6 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PresensiGPS"
         android:usesCleartextTraffic="true">
+        <activity android:name=".ui.activity.InfoActivity"></activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -24,15 +25,10 @@
 
         <activity
             android:name=".ui.activity.AdminActivity"
-            android:label="@string/title_activity_admin">
-
-        </activity>
-
+            android:label="@string/title_activity_admin"></activity>
         <activity
             android:name=".ui.activity.AboutActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ui.activity.ProfileActivity"
             android:noHistory="true"

@@ -105,7 +105,6 @@ class ReportAdapter(private val reportList: ArrayList<Result>) :
 
             itemView.btnVerifikasi.setOnClickListener {
                 if (dataResult.status == "0") {
-                    Toast.makeText(itemView.context, "memverifikasi", Toast.LENGTH_SHORT).show()
                     reportVerification(dataResult.id, itemView)
                 }
             }

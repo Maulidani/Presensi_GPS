@@ -4,15 +4,15 @@ package com.skripsi.presensigps.ui.activity
 
 import android.app.ProgressDialog
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import com.skripsi.presensigps.utils.Constant
-import com.skripsi.presensigps.utils.PreferencesHelper
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
-import com.skripsi.presensigps.network.ApiClient
 import com.skripsi.presensigps.model.DataResponse
+import com.skripsi.presensigps.network.ApiClient
+import com.skripsi.presensigps.utils.Constant
+import com.skripsi.presensigps.utils.PreferencesHelper
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_login.inputEmail
 import kotlinx.android.synthetic.main.activity_login.inputPassword
@@ -104,25 +104,49 @@ class LoginActivity : AppCompatActivity() {
 
                         saveSession(idUser, nameUser, positionUser, emailUser, passwordUser)
 
-                        if (positionUser == "admin" || positionUser == "manager") {
-                            progressDialog.dismiss()
+                        when (positionUser) {
+                            "admin" -> {
+                                progressDialog.dismiss()
 
-                            startActivity(
-                                Intent(
-                                    this@LoginActivity,
-                                    AdminActivity::class.java
+                                startActivity(
+                                    Intent(
+                                        this@LoginActivity,
+                                        AdminActivity::class.java
+                                    )
                                 )
-                            )
 
-                            Toast.makeText(this@LoginActivity, message.toString(), Toast.LENGTH_SHORT)
-                                .show()
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    message.toString(),
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
 
-                        } else if (positionUser == "sales") {
-                            getOfficeLocation()
+                            }
+                            "manager" -> {
+                                //                            startActivity(
+                    //                                Intent(
+                    //                                    this@LoginActivity,
+                    //                                    ManagerActivity::class.java
+                    //                                )
+                    //                            )
+                    //
+                    //                            Toast.makeText(
+                    //                                this@LoginActivity,
+                    //                                message.toString(),
+                    //                                Toast.LENGTH_SHORT
+                    //                            )
+                    //                                .show()
 
-                        } else {
-                            progressDialog.dismiss()
-                            sharedPref.logout()
+                            }
+                            "sales" -> {
+                                getOfficeLocation()
+
+                            }
+                            else -> {
+                                progressDialog.dismiss()
+                                sharedPref.logout()
+                            }
                         }
 
                     } else {

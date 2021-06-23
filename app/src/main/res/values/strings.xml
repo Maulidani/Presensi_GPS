@@ -25,6 +25,8 @@
     <string name="not_verifikasi">Belum diverifikasi</string>
     <string name="telah_diverifikasi">Telah diverifikasi</string>
     <string name="nama">Nama</string>
+    <string name="report_berhasil">Laporan Berhasil Terkirim</string>
+    <string name="report_gagal">Laporan Gagal, Terjadi Kesalahan</string>
     <string name="presensi_berhasil">Presensi Berhasil Terkirim, Selamat Bekerja</string>
     <string name="presensi_gagal">Presensi Gagal, Terjadi Kesalahan</string>
     <string name="success">SUKSES</string>
@@ -38,4 +40,8 @@
     <string name="batal">Batal</string>
     <string name="profil">Profil</string>
     <string name="x">X</string>
+    <string name="admin">Admin</string>
+    <string name="presensi">Presensi</string>
+    <string name="akun">Akun</string>
+    <string name="maps">Maps</string>
 </resources>

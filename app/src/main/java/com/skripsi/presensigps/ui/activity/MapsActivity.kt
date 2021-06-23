@@ -32,10 +32,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.CircleOptions
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.Task
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
@@ -46,6 +43,9 @@ import com.skripsi.presensigps.utils.PreferencesHelper
 import kotlinx.android.synthetic.main.activity_about.*
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_maps.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -66,13 +66,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationResult: LocationResult
 
+    private var latLngList = ArrayList<LatLng>()
+    private var locationNameList = ArrayList<String>()
+
     private var myLocLatitude: Double? = null
     private var myLocLongitude: Double? = null
-
+    private lateinit var updateLatLng: LatLng
     private var latOffice: Double? = null
     private var longOffice: Double? = null
     private var radius: Double = 0.0
     private var distance: Float = 0.1f
+    private var cameraZoom: Boolean = false
 
     private val cameraPermissionCode = 1
     private lateinit var resultLauncher: ActivityResultLauncher<Intent>
@@ -140,6 +144,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
+
+        getUpdateLatLng()
 
         progressDialog = ProgressDialog(this)
         progressDialog.setTitle("Loading")
@@ -231,9 +237,31 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             CameraPosition.builder().target(LatLng(latitude, longitude)).zoom(19f).build()
         )
 
-        mMap.animateCamera(cameraUpdate)
+        if (!cameraZoom) mMap.animateCamera(cameraUpdate)
+        cameraZoom = true
+
         mMap.clear()
         mMap.addMarker(MarkerOptions().position(myLocation).title("Lokasi Saya"))
+
+        var whileLoop: Boolean
+        var iName = 0
+        for (i in latLngList) {
+            updateLatLng = LatLng(i.latitude, i.longitude)
+
+            whileLoop = true
+            while (whileLoop) {
+                mMap.addMarker(
+                    MarkerOptions().position(updateLatLng).title(locationNameList[iName])
+                        .icon(
+                            BitmapDescriptorFactory.defaultMarker(
+                                BitmapDescriptorFactory.HUE_GREEN
+                            )
+                        )
+                )
+                iName += 1
+                whileLoop = false
+            }
+        }
 
         val circleOptions = CircleOptions()
         circleOptions.center(officeLocation)
@@ -528,14 +556,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     cardReport.visibility = View.INVISIBLE
                     progressDialogPresence.dismiss()
 
+                    getUpdateLatLng()
+
                     imgStatus.setImageResource(R.drawable.ic_success)
                     tvStatus.text = applicationContext.getString(R.string.success)
-                    tvKetStatus.text = applicationContext.getString(R.string.presensi_berhasil)
+                    tvKetStatus.text = applicationContext.getString(R.string.report_berhasil)
                     btnReport.visibility = View.INVISIBLE
                     btnPresent.visibility = View.INVISIBLE
                     cardDialog.visibility = View.VISIBLE
                     cardDialog.animation =
                         AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
+
+                    inputLocation.setText("")
+                    inputNotes.setText("")
 
                 } else {
                     cardReport.visibility = View.INVISIBLE
@@ -558,7 +591,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 imgStatus.setImageResource(R.drawable.ic_failed)
                 tvStatus.text = applicationContext.getString(R.string.gagal)
-                tvKetStatus.text = applicationContext.getString(R.string.presensi_gagal)
+                tvKetStatus.text = applicationContext.getString(R.string.report_gagal)
                 btnReport.visibility = View.INVISIBLE
                 btnPresent.visibility = View.INVISIBLE
                 cardDialog.visibility = View.VISIBLE
@@ -568,5 +601,69 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 thumbNail = null
             }
         })
+    }
+
+    private fun getUpdateLatLng() {
+        GlobalScope.launch(context = Dispatchers.Main) {
+
+            ApiClient.instance.getUpdateLatlngReport(sharedPref.getString(Constant.PREF_USER_ID)!!)
+                .enqueue(object : Callback<DataResponse> {
+                    override fun onResponse(
+                        call: Call<DataResponse>,
+                        response: Response<DataResponse>
+                    ) {
+                        val value = response.body()?.value
+                        var message = "Sukses Update"
+
+                        if (value.equals("1")) {
+                            latLngList.clear()
+                            locationNameList.clear()
+
+                            for (i in response.body()!!.result) {
+                                latLngList.add(
+                                    LatLng(
+                                        i.latitude.toDouble(),
+                                        i.longitude.toDouble()
+                                    )
+                                )
+                                updateLatLng = LatLng(i.latitude.toDouble(), i.longitude.toDouble())
+                                mMap.addMarker(
+                                    MarkerOptions().position(updateLatLng).title(i.location_name)
+                                        .icon(
+                                            BitmapDescriptorFactory.defaultMarker(
+                                                BitmapDescriptorFactory.HUE_GREEN
+                                            )
+                                        )
+                                )
+
+                                locationNameList.add(i.location_name)
+                            }
+                            snackbar = Snackbar.make(
+                                parentMapsActivity,
+                                message,
+                                Snackbar.LENGTH_SHORT
+                            )
+                            snackbar.show()
+                        } else {
+                            message = "Gagal Update"
+                            snackbar = Snackbar.make(
+                                parentMapsActivity,
+                                message,
+                                Snackbar.LENGTH_SHORT
+                            )
+                            snackbar.show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                        snackbar = Snackbar.make(
+                            parentMapsActivity,
+                            t.message.toString(),
+                            Snackbar.LENGTH_SHORT
+                        )
+                        snackbar.show()
+                    }
+                })
+        }
     }
 }
