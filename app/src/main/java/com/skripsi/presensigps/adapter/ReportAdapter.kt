@@ -1,8 +1,5 @@
-@file:Suppress("DEPRECATION")
-
 package com.skripsi.presensigps.adapter
 
-import android.app.ProgressDialog
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -17,34 +14,22 @@ import com.skripsi.presensigps.model.Result
 import com.skripsi.presensigps.network.ApiClient
 import com.skripsi.presensigps.utils.Constant
 import com.skripsi.presensigps.utils.PreferencesHelper
-import kotlinx.android.synthetic.main.item_presence.view.btnVerifikasi
-import kotlinx.android.synthetic.main.item_presence.view.tvDate
-import kotlinx.android.synthetic.main.item_presence.view.tvName
-import kotlinx.android.synthetic.main.item_presence.view.tvName2
-import kotlinx.android.synthetic.main.item_presence.view.tvTime
 import kotlinx.android.synthetic.main.item_report.view.*
-import kotlinx.android.synthetic.main.item_report.view.icDetails
-import kotlinx.android.synthetic.main.item_report.view.icStatus
-import kotlinx.android.synthetic.main.item_report.view.parentDetails
-import kotlinx.android.synthetic.main.item_report.view.parentNameList
-import kotlinx.android.synthetic.main.item_report.view.tvVerifikasi
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class ReportAdapter(private val reportList: ArrayList<Result>) :
+class ReportAdapter(
+    private val reportList: ArrayList<Result>,
+    private val mListener: IUserRecycler
+) :
     RecyclerView.Adapter<ReportAdapter.ReportViewHolder>() {
     private lateinit var sharedPref: PreferencesHelper
     private var positions: String? = null
-    private lateinit var progressDialog: ProgressDialog
     private val verification = "1"
 
     inner class ReportViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(dataResult: Result) {
-            progressDialog = ProgressDialog(itemView.context)
-            progressDialog.setTitle("Loading")
-            progressDialog.setMessage("Memverifikasi...")
-            progressDialog.setCancelable(false)
 
             sharedPref = PreferencesHelper(itemView.context)
             positions = sharedPref.getString(Constant.PREF_USER_POSITION)
@@ -105,13 +90,26 @@ class ReportAdapter(private val reportList: ArrayList<Result>) :
 
             itemView.btnVerifikasi.setOnClickListener {
                 if (dataResult.status == "0") {
-                    reportVerification(dataResult.id, itemView)
+                    Toast.makeText(itemView.context, "verifikasi...", Toast.LENGTH_SHORT)
+                        .show()
+
+                    reportVerification(dataResult.id, itemView, dataResult)
                 }
             }
 
             itemView.parentNameList.setOnClickListener {
                 dataResult.expendable = !dataResult.expendable
                 notifyDataSetChanged()
+            }
+
+            itemView.cardReport.setOnLongClickListener {
+                Toast.makeText(itemView.context, "long click", Toast.LENGTH_SHORT).show()
+                true
+            }
+
+            itemView.parentNameList.setOnLongClickListener {
+                Toast.makeText(itemView.context, "long click", Toast.LENGTH_SHORT).show()
+                true
             }
         }
     }
@@ -128,8 +126,7 @@ class ReportAdapter(private val reportList: ArrayList<Result>) :
 
     override fun getItemCount(): Int = reportList.size
 
-    private fun reportVerification(id: String, itemView: View) {
-        progressDialog.show()
+    private fun reportVerification(id: String, itemView: View, dataResult: Result) {
 
         ApiClient.instance.verificationReport(id, verification)
             .enqueue(object : Callback<DataResponse> {
@@ -141,20 +138,23 @@ class ReportAdapter(private val reportList: ArrayList<Result>) :
                     val message = response.body()?.message
 
                     if (value.equals("1")) {
-                        Toast.makeText(itemView.context, message.toString(), Toast.LENGTH_SHORT)
-                            .show()
+
+                        mListener.refreshView(dataResult, true, "report")
+
                     } else {
                         Toast.makeText(itemView.context, message.toString(), Toast.LENGTH_SHORT)
                             .show()
                     }
-                    progressDialog.dismiss()
                 }
 
                 override fun onFailure(call: Call<DataResponse>, t: Throwable) {
-                    progressDialog.dismiss()
                     Toast.makeText(itemView.context, t.message.toString(), Toast.LENGTH_SHORT)
                         .show()
                 }
             })
+    }
+
+    interface IUserRecycler {
+        fun refreshView(dataResult: Result, onUpdate: Boolean, type_: String)
     }
 }

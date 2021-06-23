@@ -1,9 +1,6 @@
-@file:Suppress("DEPRECATION")
-
 package com.skripsi.presensigps.adapter
 
 import android.annotation.SuppressLint
-import android.app.ProgressDialog
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -23,21 +20,20 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class PresenceAdapter(private val presenceList: ArrayList<Result>) :
+class PresenceAdapter(
+    private val presenceList: ArrayList<Result>,
+    private val mListener: IUserRecycler
+) :
     RecyclerView.Adapter<PresenceAdapter.PresenceViewHolder>() {
     private lateinit var sharedPref: PreferencesHelper
     private var positions: String? = null
-    private lateinit var progressDialog: ProgressDialog
     private val verification = "1"
 
-    inner class PresenceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class PresenceViewHolder(itemView: View) :
+        RecyclerView.ViewHolder(itemView) {
 
         @SuppressLint("UseCompatLoadingForDrawables")
         fun bind(dataResult: Result) {
-            progressDialog = ProgressDialog(itemView.context)
-            progressDialog.setTitle("Loading")
-            progressDialog.setMessage("Memverifikasi...")
-            progressDialog.setCancelable(false)
 
             sharedPref = PreferencesHelper(itemView.context)
             positions = sharedPref.getString(Constant.PREF_USER_POSITION)
@@ -95,13 +91,25 @@ class PresenceAdapter(private val presenceList: ArrayList<Result>) :
 
             itemView.btnVerifikasi.setOnClickListener {
                 if (dataResult.status == "0") {
-                    presenceVerification(dataResult.id, itemView)
+                    Toast.makeText(itemView.context, "verifikasi...", Toast.LENGTH_SHORT)
+                        .show()
+
+                    presenceVerification(dataResult.id, itemView, dataResult)
                 }
             }
 
             itemView.parentNameList.setOnClickListener {
                 dataResult.expendable = !dataResult.expendable
                 notifyDataSetChanged()
+            }
+
+            itemView.cardPresence.setOnLongClickListener {
+                Toast.makeText(itemView.context, "long click", Toast.LENGTH_SHORT).show()
+                true
+            }
+            itemView.parentNameList.setOnLongClickListener {
+                Toast.makeText(itemView.context, "long click", Toast.LENGTH_SHORT).show()
+                true
             }
         }
 
@@ -122,9 +130,7 @@ class PresenceAdapter(private val presenceList: ArrayList<Result>) :
 
     override fun getItemCount(): Int = presenceList.size
 
-    private fun presenceVerification(id: String, itemView: View) {
-        progressDialog.show()
-
+    private fun presenceVerification(id: String, itemView: View, dataResult: Result) {
         ApiClient.instance.verificationPresence(id, verification)
             .enqueue(object : Callback<DataResponse> {
                 override fun onResponse(
@@ -135,20 +141,23 @@ class PresenceAdapter(private val presenceList: ArrayList<Result>) :
                     val message = response.body()?.message
 
                     if (value.equals("1")) {
-                        Toast.makeText(itemView.context, message.toString(), Toast.LENGTH_SHORT)
-                            .show()
+
+                        mListener.refreshView(dataResult, true, "presence")
+
                     } else {
                         Toast.makeText(itemView.context, message.toString(), Toast.LENGTH_SHORT)
                             .show()
                     }
-                    progressDialog.dismiss()
                 }
 
                 override fun onFailure(call: Call<DataResponse>, t: Throwable) {
-                    progressDialog.dismiss()
                     Toast.makeText(itemView.context, t.message.toString(), Toast.LENGTH_SHORT)
                         .show()
                 }
             })
+    }
+
+    interface IUserRecycler {
+        fun refreshView(dataResult: Result, onUpdate: Boolean, type_: String)
     }
 }

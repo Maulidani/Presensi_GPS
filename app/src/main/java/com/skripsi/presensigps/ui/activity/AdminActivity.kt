@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.skripsi.presensigps.ui.activity
 
 import android.app.ProgressDialog
@@ -38,7 +40,7 @@ class AdminActivity : AppCompatActivity() {
         }
 
         progressDialog = ProgressDialog(this)
-        progressDialog.setTitle("Masuk")
+        progressDialog.setTitle("Loading")
         progressDialog.setMessage("Memuat Informasi...")
         progressDialog.setCancelable(false)
         progressDialog.show()
@@ -53,7 +55,7 @@ class AdminActivity : AppCompatActivity() {
         ApiClient.instance.getInfoAdmin().enqueue(object : Callback<DataResponse> {
             override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
                 val value = response.body()?.value
-                var message = response.body()?.message
+                val message = response.body()?.message
 
                 if (value.equals("1")) {
                     tvTotalPresensi.text = response.body()?.total_presence
@@ -63,12 +65,6 @@ class AdminActivity : AppCompatActivity() {
 
                     progressDialog.dismiss()
 
-                    Toast.makeText(
-                        this@AdminActivity,
-                        message.toString(),
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
                 } else {
                     progressDialog.dismiss()
 
@@ -79,7 +75,6 @@ class AdminActivity : AppCompatActivity() {
                     )
                         .show()
                 }
-
             }
 
             override fun onFailure(call: Call<DataResponse>, t: Throwable) {
