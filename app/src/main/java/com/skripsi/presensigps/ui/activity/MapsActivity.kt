@@ -499,13 +499,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN) || !sharedPref.getString(Constant.PREF_USER_POSITION)
+        if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN)
+        ) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+
+        } else if (!sharedPref.getString(Constant.PREF_USER_POSITION)
                 .equals("sales")
         ) {
             finish()
-
         } else {
-
             if (thumbNail != null) {
                 val imgString = convertToString()
 
@@ -618,7 +621,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         response: Response<DataResponse>
                     ) {
                         val value = response.body()?.value
-                        var message = "Sukses Update"
+                        var message = "Update"
 
                         if (value.equals("1")) {
                             latLngList.clear()

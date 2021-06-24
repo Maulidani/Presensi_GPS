@@ -112,6 +112,9 @@ class AdminActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN)) {
+            startActivity(Intent(this, LoginActivity::class.java))
+            finish()
+        } else if (sharedPref.getString(Constant.PREF_USER_POSITION) == "sales"){
             finish()
         } else {
             getInfoAdmin()

@@ -26,8 +26,17 @@ class ProfileActivity : AppCompatActivity() {
         profilePassword.setText(sharedPref.getString(Constant.PREF_USER_PASSWORD))
 
         btnLogout.setOnClickListener {
-            sharedPref.logout()
-            startActivity(Intent(this, LoginActivity::class.java))
+
+            if (sharedPref.getString(Constant.PREF_USER_POSITION) == "admin"
+                || sharedPref.getString(Constant.PREF_USER_POSITION) == "manager"
+                || sharedPref.getString(Constant.PREF_USER_POSITION) == "sales"
+            ) {
+                sharedPref.logout()
+                finish()
+            } else {
+                sharedPref.logout()
+                startActivity(Intent(this, LoginActivity::class.java))
+            }
             Toast.makeText(this, "Berhasil Keluar", Toast.LENGTH_SHORT).show()
         }
 
