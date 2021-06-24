@@ -14,7 +14,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PresensiGPS"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.activity.InfoActivity"></activity>
+        <activity android:name=".ui.activity.RegisterActivity">
+
+        </activity>
+        <activity
+            android:name=".ui.activity.SplashScreenActivity"
+            android:noHistory="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ui.activity.InfoActivity" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -25,10 +38,10 @@
 
         <activity
             android:name=".ui.activity.AdminActivity"
-            android:label="@string/title_activity_admin"></activity>
+            android:label="@string/title_activity_admin" />
         <activity
             android:name=".ui.activity.AboutActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.ProfileActivity"
             android:noHistory="true"
@@ -38,19 +51,9 @@
             android:label="@string/title_activity_maps"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".ui.activity.RegisterActivity"
-            android:noHistory="true"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".ui.activity.LoginActivity"
             android:noHistory="true"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity android:name=".MainActivity" />
     </application>
 

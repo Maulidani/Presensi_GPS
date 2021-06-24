@@ -5,13 +5,14 @@
     android:id="@+id/parentLoginActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/dark_green"
     tools:context=".ui.activity.LoginActivity">
 
     <ImageView
-        android:layout_width="100dp"
+        android:layout_width="120dp"
         android:layout_height="100dp"
         android:contentDescription="@string/todo"
-        android:src="@color/dark_green"
+        android:src="@drawable/logo_lapi_icon"
         app:layout_constraintBottom_toTopOf="@id/cardFormLogin"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -98,8 +99,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
+        android:backgroundTint="@color/white"
         android:padding="12dp"
         android:text="@string/login"
+        android:textColor="@color/dark_green"
         app:cornerRadius="8dp"
         app:layout_constraintRight_toRightOf="@id/cardFormLogin"
         app:layout_constraintTop_toBottomOf="@id/cardFormLogin" />
@@ -109,12 +112,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/daftar_disini"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
 
     <TextView
+        android:textColor="@color/white"
         android:id="@+id/tvBelumPunyaAkun"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

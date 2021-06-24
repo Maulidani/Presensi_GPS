@@ -14,9 +14,6 @@ import com.skripsi.presensigps.network.ApiClient
 import com.skripsi.presensigps.utils.Constant
 import com.skripsi.presensigps.utils.PreferencesHelper
 import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.android.synthetic.main.activity_login.inputEmail
-import kotlinx.android.synthetic.main.activity_login.inputPassword
-import kotlinx.android.synthetic.main.activity_register.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -76,10 +73,6 @@ class LoginActivity : AppCompatActivity() {
                 getInputPassword == "" -> inputPassword.error = "Tidak boleh kosong"
                 else -> loginUser(getInputEmail, getInputPassword)
             }
-        }
-
-        tvDaftarDisini.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
         }
     }
 

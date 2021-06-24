@@ -7,7 +7,7 @@
     <string name="login">Masuk</string>
     <string name="login_disini">Masuk disini</string>
     <string name="belum_punya_akun">Belum punya akun ?</string>
-    <string name="daftar_disini">Daftar disini</string>
+    <string name="daftar_disini">hubungi admin</string>
     <string name="buat_akun">Buat Akun</string>
     <string name="daftar">Daftar</string>
     <string name="sudah_punya_akun">Sudah punya akun ? Masuk</string>
@@ -44,4 +44,6 @@
     <string name="presensi">Presensi</string>
     <string name="akun">Akun</string>
     <string name="maps">Maps</string>
+    <string name="pukul">Pukul</string>
+    <string name="tanggal">Tanggal</string>
 </resources>

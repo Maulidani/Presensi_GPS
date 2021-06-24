@@ -35,7 +35,6 @@ class AdminActivity : AppCompatActivity() {
         sharedPref = PreferencesHelper(this)
 
         if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN)) {
-            startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
 
@@ -114,6 +113,8 @@ class AdminActivity : AppCompatActivity() {
         super.onResume()
         if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN)) {
             finish()
+        } else {
+            getInfoAdmin()
         }
     }
 
@@ -129,7 +130,7 @@ class AdminActivity : AppCompatActivity() {
             startActivity(Intent(this, InfoActivity::class.java).putExtra("type", "report"))
         }
         cardUser.setOnClickListener {
-//            startActivity(Intent(this, InfoActivity::class.java).putExtra("type", "user"))
+            startActivity(Intent(this, InfoActivity::class.java).putExtra("type", "user"))
         }
         cardMaps.setOnClickListener {
 //            startActivity(Intent(this, MapsActivity::class.java))

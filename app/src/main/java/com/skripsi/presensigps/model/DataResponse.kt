@@ -25,13 +25,15 @@ data class DataResponse(
     val total_report: String,
     val total_user: String,
     val time: String
-
 )
 
 data class Result(
     val id: String,
     val office: String,
     val name: String,
+    val position: String,
+    val email: String,
+    val password: String,
     val location_name: String,
     val latitude: String,
     val longitude: String,

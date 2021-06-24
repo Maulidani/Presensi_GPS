@@ -75,4 +75,12 @@ interface ApiInterface {
     @GET("get_info_admin.php")
     fun getInfoAdmin(): Call<DataResponse>
 
+    @GET("get_user.php")
+    fun getUser(): Call<DataResponse>
+
+    @FormUrlEncoded
+    @POST("delete.php")
+    fun delete(@Field("id") id: String,
+        @Field("type") type: String
+    ): Call<DataResponse>
 }

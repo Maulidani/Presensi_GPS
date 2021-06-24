@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/dark_green"
     tools:context=".ui.activity.ProfileActivity">
 
     <androidx.cardview.widget.CardView
@@ -123,9 +124,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
-        android:backgroundTint="@color/soft_red"
+        android:backgroundTint="@color/white"
         android:padding="12dp"
         android:text="@string/keluar"
+        android:textColor="@color/soft_red"
         app:cornerRadius="8dp"
         app:layout_constraintRight_toRightOf="@id/cardFormDaftar"
         app:layout_constraintTop_toBottomOf="@id/cardFormDaftar" />

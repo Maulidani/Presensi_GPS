@@ -3,15 +3,14 @@
 package com.skripsi.presensigps.ui.activity
 
 import android.app.ProgressDialog
-import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
-import com.skripsi.presensigps.network.ApiClient
 import com.skripsi.presensigps.model.DataResponse
+import com.skripsi.presensigps.network.ApiClient
 import kotlinx.android.synthetic.main.activity_login.*
 import kotlinx.android.synthetic.main.activity_register.*
 import kotlinx.android.synthetic.main.activity_register.inputEmail
@@ -29,6 +28,7 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
         supportActionBar?.title = "Daftar"
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         progressDialog = ProgressDialog(this)
         progressDialog.setTitle("Mendaftar")
@@ -57,10 +57,6 @@ class RegisterActivity : AppCompatActivity() {
                 )
             }
         }
-
-        tvMasuk.setOnClickListener {
-            startActivity(Intent(this, LoginActivity::class.java))
-        }
     }
 
     private fun registerUser(
@@ -81,12 +77,7 @@ class RegisterActivity : AppCompatActivity() {
                     val message = response.body()?.message
 
                     if (value.equals("1")) {
-                        startActivity(
-                            Intent(this@RegisterActivity, LoginActivity::class.java)
-                                .putExtra("email", inputEmail)
-                                .putExtra("password", inputPassword)
-                                .putExtra("position", inputPosition)
-                        )
+
                         progressDialog.dismiss()
 
                         Toast.makeText(
@@ -94,6 +85,8 @@ class RegisterActivity : AppCompatActivity() {
                             message.toString(),
                             Toast.LENGTH_SHORT
                         ).show()
+
+                        finish()
                     } else {
                         progressDialog.dismiss()
 
@@ -117,8 +110,10 @@ class RegisterActivity : AppCompatActivity() {
             })
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        startActivity(Intent(this, LoginActivity::class.java))
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
+
 }

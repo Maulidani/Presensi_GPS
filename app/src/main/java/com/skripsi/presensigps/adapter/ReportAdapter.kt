@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -48,7 +49,7 @@ class ReportAdapter(
             itemView.tvLongitude.text = dataResult.longitude
             itemView.tvDate.text = dataResult.date
             itemView.tvTime.text = dataResult.time
-            itemView.tvNotes.text = dataResult.notes
+            itemView.notes.setText(dataResult.notes)
 
             if (dataResult.expendable) {
                 itemView.parentDetails.visibility = View.VISIBLE
@@ -103,12 +104,12 @@ class ReportAdapter(
             }
 
             itemView.cardReport.setOnLongClickListener {
-                Toast.makeText(itemView.context, "long click", Toast.LENGTH_SHORT).show()
+                deleteAlert(itemView, dataResult.id, dataResult)
                 true
             }
 
             itemView.parentNameList.setOnLongClickListener {
-                Toast.makeText(itemView.context, "long click", Toast.LENGTH_SHORT).show()
+                deleteAlert(itemView, dataResult.id, dataResult)
                 true
             }
         }
@@ -152,6 +153,45 @@ class ReportAdapter(
                         .show()
                 }
             })
+    }
+
+    private fun delete(itemView: View, id: String, dataResult: Result) {
+        val type = "report"
+        ApiClient.instance.delete(id, type).enqueue(object : Callback<DataResponse> {
+            override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
+                val value = response.body()?.value
+
+                if (value.equals("1")) {
+
+                    mListener.refreshView(dataResult, true, type)
+                }
+
+            }
+
+            override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+
+                notifyDataSetChanged()
+                Toast.makeText(itemView.context, t.message.toString(), Toast.LENGTH_SHORT)
+                    .show()
+            }
+
+        })
+    }
+
+    private fun deleteAlert(itemView: View, id: String, dataResult: Result) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(itemView.context)
+        builder.setTitle("Aksi")
+        val options = arrayOf("Batalkan verifikasi ?", "Hapus laporan ?")
+        builder.setItems(
+            options
+        ) { _, which ->
+            when (which) {
+                0 -> Toast.makeText(itemView.context, "Batalkan verifikasi", Toast.LENGTH_SHORT).show()
+                1 -> delete(itemView, id, dataResult)
+            }
+        }
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 
     interface IUserRecycler {

@@ -499,32 +499,37 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onResume() {
         super.onResume()
-        if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN)) {
+        if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN) || !sharedPref.getString(Constant.PREF_USER_POSITION)
+                .equals("sales")
+        ) {
             finish()
-        }
 
-        if (thumbNail != null) {
-            val imgString = convertToString()
+        } else {
 
-            when (typeOnCLick) {
+            if (thumbNail != null) {
+                val imgString = convertToString()
 
-                "presence" -> presence(sharedPref.getString(Constant.PREF_USER_ID)!!, imgString)
-                "report" -> {
-                    report(
-                        sharedPref.getString(Constant.PREF_USER_ID)!!,
-                        getInputLocationName!!,
-                        getMyLocLatitude!!,
-                        getMyLocLongitude!!,
-                        getInputNotes!!,
-                        imgString
-                    )
+                when (typeOnCLick) {
+
+                    "presence" -> presence(sharedPref.getString(Constant.PREF_USER_ID)!!, imgString)
+                    "report" -> {
+                        report(
+                            sharedPref.getString(Constant.PREF_USER_ID)!!,
+                            getInputLocationName!!,
+                            getMyLocLatitude!!,
+                            getMyLocLongitude!!,
+                            getInputNotes!!,
+                            imgString
+                        )
+
+                    }
 
                 }
 
+                Log.e("onResume: ", imgString)
             }
-
-            Log.e("onResume: ", imgString)
         }
+
     }
 
     private fun report(

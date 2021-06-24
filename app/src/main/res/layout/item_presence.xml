@@ -57,6 +57,7 @@
             android:id="@+id/parentDetails"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingVertical="12dp"
             android:background="@color/white"
             android:paddingHorizontal="32dp">
 
@@ -71,6 +72,10 @@
 
             <TextView
                 android:id="@+id/tvName2"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                app:drawableStartCompat="@drawable/ic_person"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -82,6 +87,10 @@
             <TextView
                 android:id="@+id/tvOffice"
                 android:layout_width="0dp"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                app:drawableStartCompat="@drawable/ic_location"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
@@ -94,6 +103,10 @@
 
             <TextView
                 android:id="@+id/tvDate"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                app:drawableStartCompat="@drawable/ic_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -108,6 +121,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                app:drawableStartCompat="@drawable/ic_time"
                 app:layout_constraintBottom_toBottomOf="@id/tvDate"
                 app:layout_constraintLeft_toRightOf="@id/tvDate"
                 app:layout_constraintTop_toTopOf="@id/tvDate"
@@ -130,7 +147,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
                 android:backgroundTint="@color/white"
                 android:text="@string/telah_diverifikasi"
                 android:textColor="@color/black"

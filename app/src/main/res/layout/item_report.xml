@@ -2,9 +2,9 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardReport"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/cardReport"
     android:layout_marginBottom="6dp">
 
     <LinearLayout
@@ -58,92 +58,124 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:paddingHorizontal="32dp">
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/imgReport"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:src="@mipmap/ic_launcher"
-                app:layout_constraintBottom_toTopOf="@id/tvNotes"
+                app:layout_constraintBottom_toBottomOf="@id/tvDate"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="@id/tvName2" />
 
             <TextView
                 android:id="@+id/tvName2"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
-                android:layout_marginTop="12dp"
-                app:layout_constraintBottom_toTopOf="@id/tvLocation"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                app:drawableStartCompat="@drawable/ic_person"
                 app:layout_constraintLeft_toRightOf="@id/imgReport"
-                app:layout_constraintTop_toTopOf="@+id/imgReport"
-                tools:text="Charles" />
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Andi Aco" />
 
             <TextView
                 android:id="@+id/tvLocation"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toTopOf="@id/tvLatitude"
-                app:layout_constraintLeft_toRightOf="@id/imgReport"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                app:drawableStartCompat="@drawable/ic_location"
+                app:layout_constraintLeft_toLeftOf="@id/tvName2"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvName2"
-                tools:text="PT Lapi Laboratories Cabang Makassar Indonesia" />
+                tools:text="Andi Aco" />
 
             <TextView
                 android:id="@+id/tvLatitude"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toTopOf="@id/tvDate"
-                app:layout_constraintLeft_toRightOf="@id/imgReport"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                app:drawableStartCompat="@drawable/ic_latlng"
+                app:layout_constraintLeft_toLeftOf="@+id/tvName2"
                 app:layout_constraintTop_toBottomOf="@id/tvLocation"
                 tools:text="latitude" />
 
             <TextView
                 android:id="@+id/tvLongitude"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
+                android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="@id/tvLatitude"
                 app:layout_constraintLeft_toRightOf="@id/tvLatitude"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tvLatitude"
-                tools:text="longitude" />
+                tools:text="latitude" />
+
 
             <TextView
                 android:id="@+id/tvDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
                 android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toBottomOf="@id/imgReport"
-                app:layout_constraintLeft_toRightOf="@id/imgReport"
+                android:layout_marginEnd="8dp"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                app:drawableStartCompat="@drawable/ic_date"
+                app:layout_constraintLeft_toLeftOf="@id/tvName2"
+                app:layout_constraintRight_toLeftOf="@id/tvTime"
                 app:layout_constraintTop_toBottomOf="@id/tvLatitude"
-                tools:text="20021-06-13" />
+                tools:text="13 juni 2021" />
 
             <TextView
                 android:id="@+id/tvTime"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:drawablePadding="6dp"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
+                app:drawableStartCompat="@drawable/ic_time"
                 app:layout_constraintBottom_toBottomOf="@id/tvDate"
-                app:layout_constraintLeft_toRightOf="@id/tvDate"
+                app:layout_constraintLeft_toRightOf="@+id/tvDate"
+                app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tvDate"
                 tools:text="12:00:00" />
 
-            <TextView
-                android:id="@+id/tvNotes"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/notesTextField"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:layout_constraintBottom_toTopOf="@id/btnVerifikasi"
+                android:layout_marginEnd="8dp"
+                android:hint="@string/catatan"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvDate"
-                tools:text="Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla " />
+                app:layout_constraintRight_toLeftOf="@id/btnVerifikasi"
+                app:layout_constraintTop_toBottomOf="@+id/tvDate"
+                app:startIconDrawable="@drawable/ic_notes">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/notes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:inputType="none"
+                    android:textColor="@color/gray"
+                    android:textSize="12sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:id="@+id/tvVerifikasi"
@@ -161,16 +193,61 @@
                 android:id="@+id/btnVerifikasi"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:layout_marginBottom="12dp"
                 android:backgroundTint="@color/white"
                 android:text="@string/telah_diverifikasi"
                 android:textColor="@color/black"
                 android:textSize="12sp"
                 android:textStyle="italic"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/notesTextField"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvNotes" />
+                app:layout_constraintTop_toTopOf="@id/notesTextField" />
+
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/tvLocation"-->
+            <!--                android:layout_width="0dp"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginStart="24dp"-->
+            <!--                android:layout_marginTop="8dp"-->
+            <!--                app:layout_constraintBottom_toTopOf="@id/tvLatitude"-->
+            <!--                app:layout_constraintLeft_toRightOf="@id/imgReport"-->
+            <!--                app:layout_constraintRight_toRightOf="parent"-->
+            <!--                app:layout_constraintTop_toBottomOf="@id/tvName2"-->
+            <!--                tools:text="PT Lapi Laboratories Cabang Makassar Indonesia" />-->
+
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/tvDate"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginStart="24dp"-->
+            <!--                android:layout_marginTop="8dp"-->
+            <!--                app:layout_constraintBottom_toBottomOf="@id/imgReport"-->
+            <!--                app:layout_constraintLeft_toRightOf="@id/imgReport"-->
+            <!--                app:layout_constraintTop_toBottomOf="@id/tvLatitude"-->
+            <!--                tools:text="20021-06-13" />-->
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/tvTime"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginStart="12dp"-->
+            <!--                app:layout_constraintBottom_toBottomOf="@id/tvDate"-->
+            <!--                app:layout_constraintLeft_toRightOf="@id/tvDate"-->
+            <!--                app:layout_constraintTop_toTopOf="@id/tvDate"-->
+            <!--                tools:text="12:00:00" />-->
+
+            <!--            <TextView-->
+            <!--                android:id="@+id/tvNotes"-->
+            <!--                android:layout_width="0dp"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_marginTop="8dp"-->
+            <!--                app:layout_constraintBottom_toTopOf="@id/btnVerifikasi"-->
+            <!--                app:layout_constraintLeft_toLeftOf="parent"-->
+            <!--                app:layout_constraintRight_toRightOf="parent"-->
+            <!--                app:layout_constraintTop_toBottomOf="@id/tvDate"-->
+            <!--                tools:text="Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla " />-->
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
