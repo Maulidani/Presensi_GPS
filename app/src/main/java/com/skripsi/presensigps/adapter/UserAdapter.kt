@@ -98,7 +98,7 @@ class UserAdapter(
     private fun optionAlert(itemView: View, id: String, dataResult: Result) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(itemView.context)
         builder.setTitle("Aksi")
-        val options = arrayOf("Adit akun", "Hapus laporan")
+        val options = arrayOf("Edit akun", "Hapus akun")
         builder.setItems(
             options
         ) { _, which ->

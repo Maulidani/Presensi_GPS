@@ -207,7 +207,7 @@ class ReportAdapter(
     private fun deleteAlert(itemView: View, id: String, dataResult: Result) {
         val builder = AlertDialog.Builder(itemView.context)
         builder.setTitle("Hapus")
-        builder.setMessage("Hapus akun ?")
+        builder.setMessage("Hapus laporan ?")
 
         builder.setPositiveButton("Ya") { _, _ ->
             delete(itemView, id, dataResult)
