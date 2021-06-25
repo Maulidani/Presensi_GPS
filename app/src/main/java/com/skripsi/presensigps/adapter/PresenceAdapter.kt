@@ -105,11 +105,19 @@ class PresenceAdapter(
             }
 
             itemView.cardPresence.setOnLongClickListener {
-                deleteAlert(itemView, dataResult.id, dataResult)
+                if (dataResult.status == "1") {
+                    optionAlert(itemView, dataResult.id, dataResult)
+                } else {
+                    deleteAlert(itemView, dataResult.id, dataResult)
+                }
                 true
             }
             itemView.parentNameList.setOnLongClickListener {
-                deleteAlert(itemView, dataResult.id, dataResult)
+                if (dataResult.status == "1") {
+                    optionAlert(itemView, dataResult.id, dataResult)
+                } else {
+                    deleteAlert(itemView, dataResult.id, dataResult)
+                }
                 true
             }
         }
@@ -181,22 +189,36 @@ class PresenceAdapter(
         })
     }
 
-    private fun deleteAlert(itemView: View, id: String, dataResult: Result) {
+    private fun optionAlert(itemView: View, id: String, dataResult: Result) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(itemView.context)
         builder.setTitle("Aksi")
-        val options = arrayOf("Batalkan verifikasi ?", "Hapus presensi ?")
+        val options = arrayOf("Batalkan verifikasi ?", "Hapus laporan")
         builder.setItems(
             options
         ) { _, which ->
             when (which) {
                 0 -> Toast.makeText(itemView.context, "Batalkan verifikasi", Toast.LENGTH_SHORT).show()
-                1 -> delete(itemView, id, dataResult)
+                1 -> deleteAlert(itemView, id, dataResult)
             }
         }
         val dialog: AlertDialog = builder.create()
         dialog.show()
     }
 
+    private fun deleteAlert(itemView: View, id: String, dataResult: Result) {
+        val builder = AlertDialog.Builder(itemView.context)
+        builder.setTitle("Hapus")
+        builder.setMessage("Hapus akun ?")
+
+        builder.setPositiveButton("Ya") { _, _ ->
+            delete(itemView, id, dataResult)
+        }
+
+        builder.setNegativeButton("Tidak") { _, _ ->
+            // cancel
+        }
+        builder.show()
+    }
     interface IUserRecycler {
         fun refreshView(dataResult: Result, onUpdate: Boolean, type_: String)
     }

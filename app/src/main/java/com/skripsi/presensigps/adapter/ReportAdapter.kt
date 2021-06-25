@@ -191,13 +191,13 @@ class ReportAdapter(
     private fun optionAlert(itemView: View, id: String, dataResult: Result) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(itemView.context)
         builder.setTitle("Aksi")
-        val options = arrayOf("Batalkan verifikasi ?", "Hapus laporan ?")
+        val options = arrayOf("Batalkan verifikasi ?", "Hapus laporan")
         builder.setItems(
             options
         ) { _, which ->
             when (which) {
                 0 -> Toast.makeText(itemView.context, "Batalkan verifikasi", Toast.LENGTH_SHORT).show()
-                1 -> delete(itemView, id, dataResult)
+                1 -> deleteAlert(itemView, id, dataResult)
             }
         }
         val dialog: AlertDialog = builder.create()
