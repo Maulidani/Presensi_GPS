@@ -653,12 +653,14 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onResume()
         if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN)
         ) {
+            stopLocationUpdates()
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
 
         } else if (!sharedPref.getString(Constant.PREF_USER_POSITION)
                 .equals("sales")
         ) {
+            stopLocationUpdates()
             finish()
         } else {
             if (thumbNail != null) {
