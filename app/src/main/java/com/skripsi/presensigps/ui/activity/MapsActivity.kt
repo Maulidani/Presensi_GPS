@@ -284,89 +284,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         distance = officeLoc.distanceTo(myLoc)
     }
 
-    private fun checkSettingAndStartLocationUpdates() {
-        val request: LocationSettingsRequest =
-            LocationSettingsRequest.Builder().addLocationRequest(locationRequest).build()
-        val client: SettingsClient = LocationServices.getSettingsClient(this)
-
-        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(request)
-
-        task.addOnSuccessListener {
-            startLocationUpdates()
-        }
-
-        task.addOnFailureListener {
-            if (it is ResolvableApiException) {
-                val apiException: ResolvableApiException = it
-                try {
-                    apiException.startResolutionForResult(this, locationRequestCode)
-                    askLocationPermission()
-                } catch (e: IntentSender.SendIntentException) {
-                    e.printStackTrace()
-                }
-            }
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun startLocationUpdates() {
-        mFusedLocationProviderClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.getMainLooper()
-        )
-    }
-
-    private fun stopLocationUpdates() {
-        mFusedLocationProviderClient.removeLocationUpdates(locationCallback)
-    }
-
-    private fun askLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.shouldShowRequestPermissionRationale(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-        ) {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ),
-                locationRequestCode
-            )
-        } else {
-            Toast.makeText(this, "tidak", Toast.LENGTH_SHORT).show()
-            ActivityCompat.requestPermissions(
-                this, arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ),
-                locationRequestCode
-            )
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == locationRequestCode) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                checkSettingAndStartLocationUpdates()
-            }
-        }
-
-        if (requestCode == cameraPermissionCode) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                resultLauncher.launch(intent)
-            }
-        }
-    }
-
     private fun presence(idUser: String, imgString: String) {
         progressDialogPresence = ProgressDialog(this)
         progressDialogPresence.setTitle("Loading")
@@ -427,6 +344,146 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             })
     }
 
+    private fun getUpdateLatLng() {
+        GlobalScope.launch(context = Dispatchers.Main) {
+
+            ApiClient.instance.getUpdateLatlngReport(sharedPref.getString(Constant.PREF_USER_ID)!!)
+                .enqueue(object : Callback<DataResponse> {
+                    override fun onResponse(
+                        call: Call<DataResponse>,
+                        response: Response<DataResponse>
+                    ) {
+                        val value = response.body()?.value
+                        var message = "Update"
+
+                        if (value.equals("1")) {
+                            latLngList.clear()
+                            locationNameList.clear()
+
+                            for (i in response.body()!!.result) {
+                                latLngList.add(
+                                    LatLng(
+                                        i.latitude.toDouble(),
+                                        i.longitude.toDouble()
+                                    )
+                                )
+                                updateLatLng = LatLng(i.latitude.toDouble(), i.longitude.toDouble())
+                                mMap.addMarker(
+                                    MarkerOptions().position(updateLatLng).title(i.location_name)
+                                        .icon(
+                                            BitmapDescriptorFactory.defaultMarker(
+                                                BitmapDescriptorFactory.HUE_GREEN
+                                            )
+                                        )
+                                )
+
+                                locationNameList.add(i.location_name)
+                            }
+                            snackbar = Snackbar.make(
+                                parentMapsActivity,
+                                message,
+                                Snackbar.LENGTH_SHORT
+                            )
+                            snackbar.show()
+                        } else {
+                            message = "Gagal Update"
+                            snackbar = Snackbar.make(
+                                parentMapsActivity,
+                                message,
+                                Snackbar.LENGTH_SHORT
+                            )
+                            snackbar.show()
+                        }
+                    }
+
+                    override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                        snackbar = Snackbar.make(
+                            parentMapsActivity,
+                            t.message.toString(),
+                            Snackbar.LENGTH_SHORT
+                        )
+                        snackbar.show()
+                    }
+                })
+        }
+    }
+
+    private fun report(
+        idUser: String,
+        getInputLocationName: String,
+        getMyLocLatitude: String,
+        getMyLocLongitude: String,
+        getInputNotes: String,
+        imgString: String
+    ) {
+        progressDialogPresence = ProgressDialog(this)
+        progressDialogPresence.setTitle("Loading")
+        progressDialogPresence.setMessage("Mengirim Laporan...")
+        progressDialogPresence.setCancelable(false)
+
+        ApiClient.instance.addReport(
+            idUser,
+            getInputLocationName,
+            getMyLocLatitude,
+            getMyLocLongitude,
+            imgString,
+            getInputNotes
+        ).enqueue(object : Callback<DataResponse> {
+            override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
+                val value = response.body()?.value
+                val message = response.body()?.message
+
+                if (value.equals("1")) {
+                    cardReport.visibility = View.INVISIBLE
+                    progressDialogPresence.dismiss()
+
+                    getUpdateLatLng()
+
+                    imgStatus.setImageResource(R.drawable.ic_success)
+                    tvStatus.text = applicationContext.getString(R.string.success)
+                    tvKetStatus.text = applicationContext.getString(R.string.report_berhasil)
+                    btnReport.visibility = View.INVISIBLE
+                    btnPresent.visibility = View.INVISIBLE
+                    cardDialog.visibility = View.VISIBLE
+                    cardDialog.animation =
+                        AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
+
+                    inputLocation.setText("")
+                    inputNotes.setText("")
+
+                } else {
+                    cardReport.visibility = View.INVISIBLE
+                    progressDialogPresence.dismiss()
+
+                    snackbar = Snackbar.make(
+                        parentMapsActivity,
+                        message.toString(),
+                        Snackbar.LENGTH_SHORT
+                    )
+                    snackbar.show()
+                }
+
+                thumbNail = null
+            }
+
+            override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                cardReport.visibility = View.INVISIBLE
+                progressDialogPresence.dismiss()
+
+                imgStatus.setImageResource(R.drawable.ic_failed)
+                tvStatus.text = applicationContext.getString(R.string.gagal)
+                tvKetStatus.text = applicationContext.getString(R.string.report_gagal)
+                btnReport.visibility = View.INVISIBLE
+                btnPresent.visibility = View.INVISIBLE
+                cardDialog.visibility = View.VISIBLE
+                cardDialog.animation =
+                    AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
+
+                thumbNail = null
+            }
+        })
+    }
+
     private fun openCamera() {
         if (ContextCompat.checkSelfPermission(
                 this,
@@ -451,6 +508,89 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         return Base64.encodeToString(imgByte, Base64.DEFAULT)
     }
 
+
+    @SuppressLint("MissingPermission")
+    private fun startLocationUpdates() {
+        mFusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    private fun stopLocationUpdates() {
+        mFusedLocationProviderClient.removeLocationUpdates(locationCallback)
+    }
+
+    private fun askLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        ) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ),
+                locationRequestCode
+            )
+        } else {
+            Toast.makeText(this, "tidak", Toast.LENGTH_SHORT).show()
+            ActivityCompat.requestPermissions(
+                this, arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ),
+                locationRequestCode
+            )
+        }
+    }
+
+    private fun checkSettingAndStartLocationUpdates() {
+        val request: LocationSettingsRequest =
+            LocationSettingsRequest.Builder().addLocationRequest(locationRequest).build()
+        val client: SettingsClient = LocationServices.getSettingsClient(this)
+
+        val task: Task<LocationSettingsResponse> = client.checkLocationSettings(request)
+
+        task.addOnSuccessListener {
+            startLocationUpdates()
+        }
+
+        task.addOnFailureListener {
+            if (it is ResolvableApiException) {
+                val apiException: ResolvableApiException = it
+                try {
+                    apiException.startResolutionForResult(this, locationRequestCode)
+                    askLocationPermission()
+                } catch (e: IntentSender.SendIntentException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == locationRequestCode) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                checkSettingAndStartLocationUpdates()
+            }
+        }
+
+        if (requestCode == cameraPermissionCode) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                resultLauncher.launch(intent)
+            }
+        }
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
@@ -538,143 +678,4 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    private fun report(
-        idUser: String,
-        getInputLocationName: String,
-        getMyLocLatitude: String,
-        getMyLocLongitude: String,
-        getInputNotes: String,
-        imgString: String
-    ) {
-        progressDialogPresence = ProgressDialog(this)
-        progressDialogPresence.setTitle("Loading")
-        progressDialogPresence.setMessage("Mengirim Laporan...")
-        progressDialogPresence.setCancelable(false)
-
-        ApiClient.instance.addReport(
-            idUser,
-            getInputLocationName,
-            getMyLocLatitude,
-            getMyLocLongitude,
-            imgString,
-            getInputNotes
-        ).enqueue(object : Callback<DataResponse> {
-            override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
-                val value = response.body()?.value
-                val message = response.body()?.message
-
-                if (value.equals("1")) {
-                    cardReport.visibility = View.INVISIBLE
-                    progressDialogPresence.dismiss()
-
-                    getUpdateLatLng()
-
-                    imgStatus.setImageResource(R.drawable.ic_success)
-                    tvStatus.text = applicationContext.getString(R.string.success)
-                    tvKetStatus.text = applicationContext.getString(R.string.report_berhasil)
-                    btnReport.visibility = View.INVISIBLE
-                    btnPresent.visibility = View.INVISIBLE
-                    cardDialog.visibility = View.VISIBLE
-                    cardDialog.animation =
-                        AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
-
-                    inputLocation.setText("")
-                    inputNotes.setText("")
-
-                } else {
-                    cardReport.visibility = View.INVISIBLE
-                    progressDialogPresence.dismiss()
-
-                    snackbar = Snackbar.make(
-                        parentMapsActivity,
-                        message.toString(),
-                        Snackbar.LENGTH_SHORT
-                    )
-                    snackbar.show()
-                }
-
-                thumbNail = null
-            }
-
-            override fun onFailure(call: Call<DataResponse>, t: Throwable) {
-                cardReport.visibility = View.INVISIBLE
-                progressDialogPresence.dismiss()
-
-                imgStatus.setImageResource(R.drawable.ic_failed)
-                tvStatus.text = applicationContext.getString(R.string.gagal)
-                tvKetStatus.text = applicationContext.getString(R.string.report_gagal)
-                btnReport.visibility = View.INVISIBLE
-                btnPresent.visibility = View.INVISIBLE
-                cardDialog.visibility = View.VISIBLE
-                cardDialog.animation =
-                    AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
-
-                thumbNail = null
-            }
-        })
-    }
-
-    private fun getUpdateLatLng() {
-        GlobalScope.launch(context = Dispatchers.Main) {
-
-            ApiClient.instance.getUpdateLatlngReport(sharedPref.getString(Constant.PREF_USER_ID)!!)
-                .enqueue(object : Callback<DataResponse> {
-                    override fun onResponse(
-                        call: Call<DataResponse>,
-                        response: Response<DataResponse>
-                    ) {
-                        val value = response.body()?.value
-                        var message = "Update"
-
-                        if (value.equals("1")) {
-                            latLngList.clear()
-                            locationNameList.clear()
-
-                            for (i in response.body()!!.result) {
-                                latLngList.add(
-                                    LatLng(
-                                        i.latitude.toDouble(),
-                                        i.longitude.toDouble()
-                                    )
-                                )
-                                updateLatLng = LatLng(i.latitude.toDouble(), i.longitude.toDouble())
-                                mMap.addMarker(
-                                    MarkerOptions().position(updateLatLng).title(i.location_name)
-                                        .icon(
-                                            BitmapDescriptorFactory.defaultMarker(
-                                                BitmapDescriptorFactory.HUE_GREEN
-                                            )
-                                        )
-                                )
-
-                                locationNameList.add(i.location_name)
-                            }
-                            snackbar = Snackbar.make(
-                                parentMapsActivity,
-                                message,
-                                Snackbar.LENGTH_SHORT
-                            )
-                            snackbar.show()
-                        } else {
-                            message = "Gagal Update"
-                            snackbar = Snackbar.make(
-                                parentMapsActivity,
-                                message,
-                                Snackbar.LENGTH_SHORT
-                            )
-                            snackbar.show()
-                        }
-                    }
-
-                    override fun onFailure(call: Call<DataResponse>, t: Throwable) {
-                        snackbar = Snackbar.make(
-                            parentMapsActivity,
-                            t.message.toString(),
-                            Snackbar.LENGTH_SHORT
-                        )
-                        snackbar.show()
-                    }
-                })
-        }
-    }
 }
