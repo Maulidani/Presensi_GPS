@@ -226,7 +226,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 btnPresent.setBackgroundColor(Color.GRAY)
                 snackbar = Snackbar.make(
                     parentMapsActivity,
-                    "Anda Tidak Masuk Di Area Kantor" ,
+                    "Anda Tidak Masuk Area Kantor" ,
                     Snackbar.LENGTH_SHORT
                 )
                 snackbar.show()

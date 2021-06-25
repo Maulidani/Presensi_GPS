@@ -49,12 +49,12 @@ class UserAdapter(
             }
 
             itemView.cardUser.setOnLongClickListener {
-                actionOption(itemView, dataResult.id, dataResult)
+                optionAlert(itemView, dataResult.id, dataResult)
                 true
             }
 
             itemView.parentNameList.setOnLongClickListener {
-                actionOption(itemView, dataResult.id, dataResult)
+                optionAlert(itemView, dataResult.id, dataResult)
                 true
             }
         }
@@ -95,7 +95,23 @@ class UserAdapter(
         })
     }
 
-    private fun actionOption(itemView: View, id: String, dataResult: Result) {
+    private fun optionAlert(itemView: View, id: String, dataResult: Result) {
+        val builder: AlertDialog.Builder = AlertDialog.Builder(itemView.context)
+        builder.setTitle("Aksi")
+        val options = arrayOf("Adit akun", "Hapus laporan")
+        builder.setItems(
+            options
+        ) { _, which ->
+            when (which) {
+                0 -> Toast.makeText(itemView.context, "Edit akun", Toast.LENGTH_SHORT).show()
+                1 -> deleteAlert(itemView, id, dataResult)
+            }
+        }
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
+
+    private fun deleteAlert(itemView: View, id: String, dataResult: Result) {
         val builder = AlertDialog.Builder(itemView.context)
         builder.setTitle("Hapus")
         builder.setMessage("Hapus akun ?")

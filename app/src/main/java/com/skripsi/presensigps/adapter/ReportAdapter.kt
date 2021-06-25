@@ -104,12 +104,22 @@ class ReportAdapter(
             }
 
             itemView.cardReport.setOnLongClickListener {
-                deleteAlert(itemView, dataResult.id, dataResult)
+
+                if (dataResult.status == "1") {
+                    optionAlert(itemView, dataResult.id, dataResult)
+                } else {
+                    deleteAlert(itemView, dataResult.id, dataResult)
+                }
+
                 true
             }
 
             itemView.parentNameList.setOnLongClickListener {
-                deleteAlert(itemView, dataResult.id, dataResult)
+                if (dataResult.status == "1") {
+                    optionAlert(itemView, dataResult.id, dataResult)
+                } else {
+                    deleteAlert(itemView, dataResult.id, dataResult)
+                }
                 true
             }
         }
@@ -178,7 +188,7 @@ class ReportAdapter(
         })
     }
 
-    private fun deleteAlert(itemView: View, id: String, dataResult: Result) {
+    private fun optionAlert(itemView: View, id: String, dataResult: Result) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(itemView.context)
         builder.setTitle("Aksi")
         val options = arrayOf("Batalkan verifikasi ?", "Hapus laporan ?")
@@ -192,6 +202,21 @@ class ReportAdapter(
         }
         val dialog: AlertDialog = builder.create()
         dialog.show()
+    }
+
+    private fun deleteAlert(itemView: View, id: String, dataResult: Result) {
+        val builder = AlertDialog.Builder(itemView.context)
+        builder.setTitle("Hapus")
+        builder.setMessage("Hapus akun ?")
+
+        builder.setPositiveButton("Ya") { _, _ ->
+            delete(itemView, id, dataResult)
+        }
+
+        builder.setNegativeButton("Tidak") { _, _ ->
+            // cancel
+        }
+        builder.show()
     }
 
     interface IUserRecycler {
