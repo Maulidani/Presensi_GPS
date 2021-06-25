@@ -36,27 +36,7 @@ class LoginActivity : AppCompatActivity() {
 
         sharedPref = PreferencesHelper(this)
 
-        val position = sharedPref.getString(Constant.PREF_USER_POSITION)
-
-        if (sharedPref.getBoolean(Constant.PREF_IS_LOGIN)) {
-            if (position == "admin" || position == "manager") {
-                startActivity(
-                    Intent(
-                        this@LoginActivity,
-                        AdminActivity::class.java
-                    )
-                )
-            } else if (position == "sales") {
-                startActivity(
-                    Intent(
-                        this@LoginActivity,
-                        MapsActivity::class.java
-                    )
-                )
-            } else {
-                sharedPref.logout()
-            }
-        }
+        loginCheck()
 
         val emailFromRegister = intent.getStringExtra("email")
         val passwordFromRegister = intent.getStringExtra("password")
@@ -117,20 +97,7 @@ class LoginActivity : AppCompatActivity() {
 
                             }
                             "manager" -> {
-                                //                            startActivity(
-                    //                                Intent(
-                    //                                    this@LoginActivity,
-                    //                                    ManagerActivity::class.java
-                    //                                )
-                    //                            )
-                    //
-                    //                            Toast.makeText(
-                    //                                this@LoginActivity,
-                    //                                message.toString(),
-                    //                                Toast.LENGTH_SHORT
-                    //                            )
-                    //                                .show()
-
+                                // manager
                             }
                             "sales" -> {
                                 getOfficeLocation()
@@ -229,5 +196,36 @@ class LoginActivity : AppCompatActivity() {
                     .show()
             }
         })
+    }
+
+    private fun loginCheck() {
+        val position = sharedPref.getString(Constant.PREF_USER_POSITION)
+
+        if (sharedPref.getBoolean(Constant.PREF_IS_LOGIN)) {
+            when (position) {
+                "admin" -> {
+                    startActivity(
+                        Intent(
+                            this@LoginActivity,
+                            AdminActivity::class.java
+                        )
+                    )
+                }
+                "manager" -> {
+                    // manager
+                }
+                "sales" -> {
+                    startActivity(
+                        Intent(
+                            this@LoginActivity,
+                            MapsActivity::class.java
+                        )
+                    )
+                }
+                else -> {
+                    sharedPref.logout()
+                }
+            }
+        }
     }
 }
