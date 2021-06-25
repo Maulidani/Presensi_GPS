@@ -43,6 +43,17 @@
         map:layout_constraintLeft_toRightOf="@id/btnReport"
         map:layout_constraintRight_toRightOf="parent" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabMyLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="@color/white"
+        android:contentDescription="@string/todo"
+        android:src="@drawable/ic_latlng_green"
+        map:layout_constraintBottom_toTopOf="@id/btnPresent"
+        map:layout_constraintRight_toRightOf="@id/btnPresent" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/cardDialog"
         android:layout_width="match_parent"

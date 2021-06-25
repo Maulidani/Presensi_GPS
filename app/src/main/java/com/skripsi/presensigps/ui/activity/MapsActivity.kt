@@ -165,6 +165,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationRequest.fastestInterval = 2000
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
 
+        fabMyLocation.setOnClickListener {
+            val cameraUpdate: CameraUpdate = CameraUpdateFactory.newCameraPosition(
+                CameraPosition.builder().target(LatLng(myLocLatitude!!, myLocLongitude!!)).zoom(19f)
+                    .build()
+            )
+
+            mMap.animateCamera(cameraUpdate)
+        }
+
         btnOk.setOnClickListener {
             cardDialog.visibility = View.INVISIBLE
             btnReport.visibility = View.VISIBLE
