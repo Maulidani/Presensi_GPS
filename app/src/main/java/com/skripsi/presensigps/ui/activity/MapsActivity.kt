@@ -60,6 +60,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var snackbar: Snackbar
     private lateinit var progressDialog: ProgressDialog
     private lateinit var progressDialogPresence: ProgressDialog
+    private lateinit var progressDialogReport: ProgressDialog
 
     private val locationRequestCode = 1001
     private lateinit var mMap: GoogleMap
@@ -225,8 +226,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 btnPresent.setBackgroundColor(Color.GRAY)
                 snackbar = Snackbar.make(
                     parentMapsActivity,
-                    "Anda Tidak Masuk Di Area Kantor,\n" +
-                            "Maksimal Jarak 50 Meter",
+                    "Anda Tidak Masuk Di Area Kantor" ,
                     Snackbar.LENGTH_SHORT
                 )
                 snackbar.show()
@@ -425,10 +425,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         getInputNotes: String,
         imgString: String
     ) {
-        progressDialogPresence = ProgressDialog(this)
-        progressDialogPresence.setTitle("Loading")
-        progressDialogPresence.setMessage("Mengirim Laporan...")
-        progressDialogPresence.setCancelable(false)
+        progressDialogReport = ProgressDialog(this)
+        progressDialogReport.setTitle("Loading")
+        progressDialogReport.setMessage("Mengirim Laporan...")
+        progressDialogReport.setCancelable(false)
+        progressDialogReport.show()
 
         ApiClient.instance.addReport(
             idUser,
@@ -444,7 +445,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 if (value.equals("1")) {
                     cardReport.visibility = View.INVISIBLE
-                    progressDialogPresence.dismiss()
 
                     getUpdateLatLng()
 
@@ -462,7 +462,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 } else {
                     cardReport.visibility = View.INVISIBLE
-                    progressDialogPresence.dismiss()
 
                     snackbar = Snackbar.make(
                         parentMapsActivity,
@@ -472,12 +471,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     snackbar.show()
                 }
 
+                progressDialogReport.dismiss()
                 thumbNail = null
             }
 
             override fun onFailure(call: Call<DataResponse>, t: Throwable) {
                 cardReport.visibility = View.INVISIBLE
-                progressDialogPresence.dismiss()
+                progressDialogReport.dismiss()
 
                 imgStatus.setImageResource(R.drawable.ic_failed)
                 tvStatus.text = applicationContext.getString(R.string.gagal)
