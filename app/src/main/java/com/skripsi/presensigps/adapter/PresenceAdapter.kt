@@ -197,7 +197,8 @@ class PresenceAdapter(
             options
         ) { _, which ->
             when (which) {
-                0 -> Toast.makeText(itemView.context, "Batalkan verifikasi", Toast.LENGTH_SHORT).show()
+                0 -> Toast.makeText(itemView.context, "Batalkan verifikasi", Toast.LENGTH_SHORT)
+                    .show()
                 1 -> deleteAlert(itemView, id, dataResult)
             }
         }
@@ -219,6 +220,7 @@ class PresenceAdapter(
         }
         builder.show()
     }
+
     interface IUserRecycler {
         fun refreshView(dataResult: Result, onUpdate: Boolean, type_: String)
     }
