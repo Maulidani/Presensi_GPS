@@ -34,7 +34,7 @@
         tools:text="Andi Aco" />
 
     <TextView
-        android:id="@+id/tvEmail"
+        android:id="@+id/tvPosition"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"

@@ -107,13 +107,32 @@ class ReportAdapter(
             }
 
             itemView.cardReport.setOnLongClickListener {
-                optionAlert(itemView, dataResult.id, dataResult)
+                if (positions == "admin") {
+                    optionAlert(itemView, dataResult.id, dataResult)
+                }
                 true
             }
 
             itemView.parentNameList.setOnLongClickListener {
-                optionAlert(itemView, dataResult.id, dataResult)
+                if (positions == "admin") {
+                    optionAlert(itemView, dataResult.id, dataResult)
+                }
                 true
+            }
+
+            itemView.parentDetails.setOnClickListener {
+                if (positions == "manager") {
+                    ContextCompat.startActivity(
+                        itemView.context,
+                        Intent(itemView.context, MapsInfoActivity::class.java)
+                            .putExtra("cek", true)
+                            .putExtra("latitude", dataResult.latitude)
+                            .putExtra("longitude", dataResult.longitude)
+                            .putExtra("name", dataResult.name)
+                            .putExtra("status", dataResult.status),
+                        null
+                    )
+                }
             }
         }
     }
@@ -214,42 +233,48 @@ class ReportAdapter(
         val builder: AlertDialog.Builder = AlertDialog.Builder(itemView.context)
         builder.setTitle("Aksi")
 
-        if (dataResult.status == "1") {
-            options = arrayOf("Lihat lokasi", "Batalkan verifikasi", "Hapus laporan")
-            builder.setItems(
-                options
-            ) { _, which ->
-                when (which) {
-                    0 -> {
-                        ContextCompat.startActivity(
-                            itemView.context, Intent(itemView.context, MapsInfoActivity::class.java)
-                                .putExtra("cek", true)
-                                .putExtra("latitude", dataResult.latitude)
-                                .putExtra("longitude", dataResult.longitude)
-                                .putExtra("name", dataResult.name)
-                                .putExtra("status", dataResult.status), null
-                        )
+        if (positions == "admin") {
+            if (dataResult.status == "1") {
+                options = arrayOf("Lihat lokasi", "Batalkan verifikasi", "Hapus laporan")
+                builder.setItems(
+                    options
+                ) { _, which ->
+                    when (which) {
+                        0 -> {
+                            ContextCompat.startActivity(
+                                itemView.context,
+                                Intent(itemView.context, MapsInfoActivity::class.java)
+                                    .putExtra("cek", true)
+                                    .putExtra("latitude", dataResult.latitude)
+                                    .putExtra("longitude", dataResult.longitude)
+                                    .putExtra("name", dataResult.name)
+                                    .putExtra("status", dataResult.status),
+                                null
+                            )
+                        }
+                        1 -> reportCancelVerification(dataResult.id, itemView, dataResult)
+                        2 -> deleteAlert(itemView, id, dataResult)
                     }
-                    1 -> reportCancelVerification(dataResult.id, itemView, dataResult)
-                    2 -> deleteAlert(itemView, id, dataResult)
                 }
-            }
-        } else {
-            options = arrayOf("Lihat lokasi", "Hapus laporan")
-            builder.setItems(
-                options
-            ) { _, which ->
-                when (which) {
-                    0 -> {
-                        ContextCompat.startActivity(
-                            itemView.context, Intent(itemView.context, MapsInfoActivity::class.java)
-                                .putExtra("cek", true)
-                                .putExtra("latitude", dataResult.latitude)
-                                .putExtra("longitude", dataResult.longitude)
-                                .putExtra("name", dataResult.name), null
-                        )
+            } else {
+                options = arrayOf("Lihat lokasi", "Hapus laporan")
+                builder.setItems(
+                    options
+                ) { _, which ->
+                    when (which) {
+                        0 -> {
+                            ContextCompat.startActivity(
+                                itemView.context,
+                                Intent(itemView.context, MapsInfoActivity::class.java)
+                                    .putExtra("cek", true)
+                                    .putExtra("latitude", dataResult.latitude)
+                                    .putExtra("longitude", dataResult.longitude)
+                                    .putExtra("name", dataResult.name),
+                                null
+                            )
+                        }
+                        1 -> deleteAlert(itemView, id, dataResult)
                     }
-                    1 -> deleteAlert(itemView, id, dataResult)
                 }
             }
         }

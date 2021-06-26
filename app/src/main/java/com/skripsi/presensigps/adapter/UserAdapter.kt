@@ -14,6 +14,8 @@ import com.skripsi.presensigps.model.DataResponse
 import com.skripsi.presensigps.model.Result
 import com.skripsi.presensigps.network.ApiClient
 import com.skripsi.presensigps.ui.activity.RegisterActivity
+import com.skripsi.presensigps.utils.Constant
+import com.skripsi.presensigps.utils.PreferencesHelper
 import kotlinx.android.synthetic.main.item_user.view.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -25,9 +27,14 @@ class UserAdapter(
     private val mListener: IUserRecycler
 ) :
     RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
+    private lateinit var sharedPref: PreferencesHelper
+    private var positions: String? = null
 
     inner class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(dataResult: Result) {
+
+            sharedPref = PreferencesHelper(itemView.context)
+            positions = sharedPref.getString(Constant.PREF_USER_POSITION)
 
             itemView.tvName.text = dataResult.name
             itemView.tvName2.text = dataResult.name
@@ -101,27 +108,31 @@ class UserAdapter(
     private fun optionAlert(itemView: View, id: String, dataResult: Result) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(itemView.context)
         builder.setTitle("Aksi")
-        val options = arrayOf("Edit akun", "Hapus akun")
-        builder.setItems(
-            options
-        ) { _, which ->
-            when (which) {
-                0 -> {
-                    startActivity(
-                        itemView.context, Intent(itemView.context, RegisterActivity::class.java)
-                            .putExtra("cek", true)
-                            .putExtra("id", dataResult.id)
-                            .putExtra("name", dataResult.name)
-                            .putExtra("position", dataResult.position)
-                            .putExtra("email", dataResult.email)
-                            .putExtra("password", dataResult.password)
-                    ,null)
+
+        if (positions == "admin") {
+            val options = arrayOf("Edit akun", "Hapus akun")
+            builder.setItems(
+                options
+            ) { _, which ->
+                when (which) {
+                    0 -> {
+                        startActivity(
+                            itemView.context, Intent(itemView.context, RegisterActivity::class.java)
+                                .putExtra("cek", true)
+                                .putExtra("id", dataResult.id)
+                                .putExtra("name", dataResult.name)
+                                .putExtra("position", dataResult.position)
+                                .putExtra("email", dataResult.email)
+                                .putExtra("password", dataResult.password), null
+                        )
+                    }
+                    1 -> deleteAlert(itemView, id, dataResult)
                 }
-                1 -> deleteAlert(itemView, id, dataResult)
             }
+            val dialog: AlertDialog = builder.create()
+            dialog.show()
         }
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
+
     }
 
     private fun deleteAlert(itemView: View, id: String, dataResult: Result) {

@@ -37,6 +37,7 @@ class InfoActivity : AppCompatActivity(), PresenceAdapter.IUserRecycler,
     private lateinit var snackbar: Snackbar
     private lateinit var progressDialog: ProgressDialog
     private lateinit var type: String
+    private var admin: Boolean? = null
     private var onUpdate: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +45,7 @@ class InfoActivity : AppCompatActivity(), PresenceAdapter.IUserRecycler,
         setContentView(R.layout.activity_info)
 
         type = intent.getStringExtra("type").toString()
+        admin = intent.getBooleanExtra("type", false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         progressDialog = ProgressDialog(this)
@@ -252,7 +254,7 @@ class InfoActivity : AppCompatActivity(), PresenceAdapter.IUserRecycler,
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (type == "user") {
+        if (type == "user" && admin == true) {
             val inflater: MenuInflater = menuInflater
             inflater.inflate(R.menu.add_user, menu)
         }

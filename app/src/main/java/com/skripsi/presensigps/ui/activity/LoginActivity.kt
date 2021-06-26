@@ -97,7 +97,21 @@ class LoginActivity : AppCompatActivity() {
 
                             }
                             "manager" -> {
-                                // manager
+                                progressDialog.dismiss()
+
+                                startActivity(
+                                    Intent(
+                                        this@LoginActivity,
+                                        AdminActivity::class.java
+                                    )
+                                )
+
+                                Toast.makeText(
+                                    this@LoginActivity,
+                                    message.toString(),
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
                             }
                             "sales" -> {
                                 getOfficeLocation()
@@ -212,7 +226,12 @@ class LoginActivity : AppCompatActivity() {
                     )
                 }
                 "manager" -> {
-                    // manager
+                    startActivity(
+                        Intent(
+                            this@LoginActivity,
+                            AdminActivity::class.java
+                        )
+                    )
                 }
                 "sales" -> {
                     startActivity(

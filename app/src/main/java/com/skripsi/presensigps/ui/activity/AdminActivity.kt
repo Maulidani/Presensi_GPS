@@ -45,6 +45,7 @@ class AdminActivity : AppCompatActivity() {
         progressDialog.show()
 
         tvName.text = sharedPref.getString(Constant.PREF_USER_NAME).toString()
+        tvPosition.text = sharedPref.getString(Constant.PREF_USER_POSITION).toString()
 
         getInfoAdmin()
         btnOnClick()
@@ -132,11 +133,19 @@ class AdminActivity : AppCompatActivity() {
         cardReport.setOnClickListener {
             startActivity(Intent(this, InfoActivity::class.java).putExtra("type", "report"))
         }
-        cardUser.setOnClickListener {
-            startActivity(Intent(this, InfoActivity::class.java).putExtra("type", "user"))
-        }
         cardMaps.setOnClickListener {
             startActivity(Intent(this, MapsInfoActivity::class.java))
+        }
+        cardUser.setOnClickListener {
+            if (sharedPref.getString(Constant.PREF_USER_POSITION)=="admin"){
+                startActivity(Intent(this, InfoActivity::class.java)
+                    .putExtra("type", "user")
+                    .putExtra("admin",true))
+            } else {
+                startActivity(Intent(this, InfoActivity::class.java)
+                    .putExtra("type", "user")
+                    .putExtra("admin",false))
+            }
         }
     }
 
