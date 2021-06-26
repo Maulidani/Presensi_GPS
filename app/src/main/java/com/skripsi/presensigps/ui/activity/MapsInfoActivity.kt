@@ -111,7 +111,7 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
                         LatLngLocation = LatLng(i.latitude.toDouble(), i.longitude.toDouble())
                         if (i.status == "1") {
                             mMap.addMarker(
-                                MarkerOptions().position(LatLngLocation).title(i.location_name)
+                                MarkerOptions().position(LatLngLocation).title(i.name)
                                     .icon(
                                         BitmapDescriptorFactory.defaultMarker(
                                             BitmapDescriptorFactory.HUE_GREEN
@@ -120,7 +120,7 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
                             )
                         } else {
                             mMap.addMarker(
-                                MarkerOptions().position(LatLngLocation).title(i.location_name)
+                                MarkerOptions().position(LatLngLocation).title(i.name)
                             )
                         }
                     }

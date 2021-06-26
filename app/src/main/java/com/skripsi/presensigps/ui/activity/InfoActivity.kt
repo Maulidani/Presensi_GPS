@@ -45,7 +45,7 @@ class InfoActivity : AppCompatActivity(), PresenceAdapter.IUserRecycler,
         setContentView(R.layout.activity_info)
 
         type = intent.getStringExtra("type").toString()
-        admin = intent.getBooleanExtra("type", false)
+        admin = intent.getBooleanExtra("admin", false)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         progressDialog = ProgressDialog(this)
