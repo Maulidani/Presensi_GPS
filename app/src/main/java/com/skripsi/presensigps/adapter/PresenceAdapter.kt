@@ -29,6 +29,7 @@ class PresenceAdapter(
     private lateinit var sharedPref: PreferencesHelper
     private var positions: String? = null
     private val verification = "1"
+    private val cancelVerification = "0"
 
     inner class PresenceViewHolder(itemView: View) :
         RecyclerView.ViewHolder(itemView) {
@@ -140,7 +141,7 @@ class PresenceAdapter(
     override fun getItemCount(): Int = presenceList.size
 
     private fun presenceVerification(id: String, itemView: View, dataResult: Result) {
-        ApiClient.instance.verificationPresence(id, verification)
+        ApiClient.instance.verification(id, verification, "presence")
             .enqueue(object : Callback<DataResponse> {
                 override fun onResponse(
                     call: Call<DataResponse>,
@@ -163,6 +164,34 @@ class PresenceAdapter(
                     Toast.makeText(itemView.context, t.message.toString(), Toast.LENGTH_SHORT)
                         .show()
                 }
+            })
+    }
+
+    private fun presenceCancelVerification(id: String, itemView: View, dataResult: Result) {
+        ApiClient.instance.cancelVerification(id, cancelVerification, "presence")
+            .enqueue(object : Callback<DataResponse> {
+                override fun onResponse(
+                    call: Call<DataResponse>,
+                    response: Response<DataResponse>
+                ) {
+                    val value = response.body()?.value
+                    val message = response.body()?.message
+
+                    if (value.equals("1")) {
+
+                        mListener.refreshView(dataResult, true, "presence")
+
+                    } else {
+                        Toast.makeText(itemView.context, message.toString(), Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+
+                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                    Toast.makeText(itemView.context, t.message.toString(), Toast.LENGTH_SHORT)
+                        .show()
+                }
+
             })
     }
 
@@ -192,13 +221,12 @@ class PresenceAdapter(
     private fun optionAlert(itemView: View, id: String, dataResult: Result) {
         val builder: AlertDialog.Builder = AlertDialog.Builder(itemView.context)
         builder.setTitle("Aksi")
-        val options = arrayOf("Batalkan verifikasi ?", "Hapus presensi")
+        val options = arrayOf("Batalkan verifikasi", "Hapus presensi")
         builder.setItems(
             options
         ) { _, which ->
             when (which) {
-                0 -> Toast.makeText(itemView.context, "Batalkan verifikasi", Toast.LENGTH_SHORT)
-                    .show()
+                0 -> presenceCancelVerification(dataResult.id, itemView, dataResult)
                 1 -> deleteAlert(itemView, id, dataResult)
             }
         }

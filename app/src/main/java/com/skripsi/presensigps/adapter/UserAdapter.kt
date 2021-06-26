@@ -1,16 +1,19 @@
 package com.skripsi.presensigps.adapter
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.skripsi.presensigps.R
 import com.skripsi.presensigps.model.DataResponse
 import com.skripsi.presensigps.model.Result
 import com.skripsi.presensigps.network.ApiClient
+import com.skripsi.presensigps.ui.activity.RegisterActivity
 import kotlinx.android.synthetic.main.item_user.view.*
 import retrofit2.Call
 import retrofit2.Callback
@@ -103,7 +106,17 @@ class UserAdapter(
             options
         ) { _, which ->
             when (which) {
-                0 -> Toast.makeText(itemView.context, "Edit akun", Toast.LENGTH_SHORT).show()
+                0 -> {
+                    startActivity(
+                        itemView.context, Intent(itemView.context, RegisterActivity::class.java)
+                            .putExtra("cek", true)
+                            .putExtra("id", dataResult.id)
+                            .putExtra("name", dataResult.name)
+                            .putExtra("position", dataResult.position)
+                            .putExtra("email", dataResult.email)
+                            .putExtra("password", dataResult.password)
+                    ,null)
+                }
                 1 -> deleteAlert(itemView, id, dataResult)
             }
         }

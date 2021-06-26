@@ -42,21 +42,30 @@ interface ApiInterface {
     ): Call<DataResponse>
 
     @FormUrlEncoded
-    @POST("presence_verification.php")
-    fun verificationPresence(
+    @POST("verification.php")
+    fun verification(
         @Field("id") id: String,
-        @Field("status") status: String
+        @Field("status") status: String,
+        @Field("type") type: String
     ): Call<DataResponse>
 
     @FormUrlEncoded
-    @POST("report_verification.php")
-    fun verificationReport(
-        @Field("id") id: String,
-        @Field("status") status: String
+    @POST("edit_user.php")
+    fun editUser(
+        @Field("id") idName: String,
+        @Field("name") name: String,
+        @Field("email") email: String,
+        @Field("password") password: String,
+        @Field("position") position: String
     ): Call<DataResponse>
 
-//    @GET("get_position.php")
-//    fun getPosition(): Call<DataResponse>
+    @FormUrlEncoded
+    @POST("cancel_verification.php")
+    fun cancelVerification(
+        @Field("id") id: String,
+        @Field("status") status: String,
+        @Field("type") type: String
+    ): Call<DataResponse>
 
     @GET("office_location.php")
     fun getOfficeLocation(): Call<DataResponse>
@@ -80,7 +89,8 @@ interface ApiInterface {
 
     @FormUrlEncoded
     @POST("delete.php")
-    fun delete(@Field("id") id: String,
+    fun delete(
+        @Field("id") id: String,
         @Field("type") type: String
     ): Call<DataResponse>
 }

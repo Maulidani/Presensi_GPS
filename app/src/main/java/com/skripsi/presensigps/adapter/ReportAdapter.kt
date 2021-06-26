@@ -1,5 +1,6 @@
 package com.skripsi.presensigps.adapter
 
+import android.content.Intent
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import com.skripsi.presensigps.R
 import com.skripsi.presensigps.model.DataResponse
 import com.skripsi.presensigps.model.Result
 import com.skripsi.presensigps.network.ApiClient
+import com.skripsi.presensigps.ui.activity.MapsInfoActivity
 import com.skripsi.presensigps.utils.Constant
 import com.skripsi.presensigps.utils.PreferencesHelper
 import kotlinx.android.synthetic.main.item_report.view.*
@@ -28,6 +30,7 @@ class ReportAdapter(
     private lateinit var sharedPref: PreferencesHelper
     private var positions: String? = null
     private val verification = "1"
+    private val cancelVerification = "0"
 
     inner class ReportViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(dataResult: Result) {
@@ -104,22 +107,12 @@ class ReportAdapter(
             }
 
             itemView.cardReport.setOnLongClickListener {
-
-                if (dataResult.status == "1") {
-                    optionAlert(itemView, dataResult.id, dataResult)
-                } else {
-                    deleteAlert(itemView, dataResult.id, dataResult)
-                }
-
+                optionAlert(itemView, dataResult.id, dataResult)
                 true
             }
 
             itemView.parentNameList.setOnLongClickListener {
-                if (dataResult.status == "1") {
-                    optionAlert(itemView, dataResult.id, dataResult)
-                } else {
-                    deleteAlert(itemView, dataResult.id, dataResult)
-                }
+                optionAlert(itemView, dataResult.id, dataResult)
                 true
             }
         }
@@ -139,7 +132,7 @@ class ReportAdapter(
 
     private fun reportVerification(id: String, itemView: View, dataResult: Result) {
 
-        ApiClient.instance.verificationReport(id, verification)
+        ApiClient.instance.verification(id, verification, "report")
             .enqueue(object : Callback<DataResponse> {
                 override fun onResponse(
                     call: Call<DataResponse>,
@@ -162,6 +155,34 @@ class ReportAdapter(
                     Toast.makeText(itemView.context, t.message.toString(), Toast.LENGTH_SHORT)
                         .show()
                 }
+            })
+    }
+
+    private fun reportCancelVerification(id: String, itemView: View, dataResult: Result) {
+        ApiClient.instance.cancelVerification(id, cancelVerification, "report")
+            .enqueue(object : Callback<DataResponse> {
+                override fun onResponse(
+                    call: Call<DataResponse>,
+                    response: Response<DataResponse>
+                ) {
+                    val value = response.body()?.value
+                    val message = response.body()?.message
+
+                    if (value.equals("1")) {
+
+                        mListener.refreshView(dataResult, true, "report")
+
+                    } else {
+                        Toast.makeText(itemView.context, message.toString(), Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+
+                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                    Toast.makeText(itemView.context, t.message.toString(), Toast.LENGTH_SHORT)
+                        .show()
+                }
+
             })
     }
 
@@ -189,18 +210,51 @@ class ReportAdapter(
     }
 
     private fun optionAlert(itemView: View, id: String, dataResult: Result) {
+        val options: Array<String>
         val builder: AlertDialog.Builder = AlertDialog.Builder(itemView.context)
         builder.setTitle("Aksi")
-        val options = arrayOf("Batalkan verifikasi ?", "Hapus laporan")
-        builder.setItems(
-            options
-        ) { _, which ->
-            when (which) {
-                0 -> Toast.makeText(itemView.context, "Batalkan verifikasi", Toast.LENGTH_SHORT)
-                    .show()
-                1 -> deleteAlert(itemView, id, dataResult)
+
+        if (dataResult.status == "1") {
+            options = arrayOf("Lihat lokasi", "Batalkan verifikasi", "Hapus laporan")
+            builder.setItems(
+                options
+            ) { _, which ->
+                when (which) {
+                    0 -> {
+                        ContextCompat.startActivity(
+                            itemView.context, Intent(itemView.context, MapsInfoActivity::class.java)
+                                .putExtra("cek", true)
+                                .putExtra("latitude", dataResult.latitude)
+                                .putExtra("longitude", dataResult.longitude)
+                                .putExtra("name", dataResult.name)
+                                .putExtra("status", dataResult.status), null
+                        )
+                    }
+                    1 -> reportCancelVerification(dataResult.id, itemView, dataResult)
+                    2 -> deleteAlert(itemView, id, dataResult)
+                }
+            }
+        } else {
+            options = arrayOf("Lihat lokasi", "Hapus laporan")
+            builder.setItems(
+                options
+            ) { _, which ->
+                when (which) {
+                    0 -> {
+                        ContextCompat.startActivity(
+                            itemView.context, Intent(itemView.context, MapsInfoActivity::class.java)
+                                .putExtra("cek", true)
+                                .putExtra("latitude", dataResult.latitude)
+                                .putExtra("longitude", dataResult.longitude)
+                                .putExtra("name", dataResult.name), null
+                        )
+                    }
+                    1 -> deleteAlert(itemView, id, dataResult)
+                }
             }
         }
+
+
         val dialog: AlertDialog = builder.create()
         dialog.show()
     }

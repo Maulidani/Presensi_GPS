@@ -171,7 +171,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 CameraPosition.builder().target(LatLng(myLocLatitude!!, myLocLongitude!!)).zoom(19f)
                     .build()
             )
-
             mMap.animateCamera(cameraUpdate)
         }
 
@@ -377,6 +376,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                                     )
                                 )
                                 updateLatLng = LatLng(i.latitude.toDouble(), i.longitude.toDouble())
+
                                 mMap.addMarker(
                                     MarkerOptions().position(updateLatLng).title(i.location_name)
                                         .icon(

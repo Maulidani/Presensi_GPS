@@ -114,7 +114,7 @@ class AdminActivity : AppCompatActivity() {
         if (!sharedPref.getBoolean(Constant.PREF_IS_LOGIN)) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
-        } else if (sharedPref.getString(Constant.PREF_USER_POSITION) == "sales"){
+        } else if (sharedPref.getString(Constant.PREF_USER_POSITION) == "sales") {
             finish()
         } else {
             getInfoAdmin()
@@ -136,7 +136,7 @@ class AdminActivity : AppCompatActivity() {
             startActivity(Intent(this, InfoActivity::class.java).putExtra("type", "user"))
         }
         cardMaps.setOnClickListener {
-//            startActivity(Intent(this, MapsActivity::class.java))
+            startActivity(Intent(this, MapsInfoActivity::class.java))
         }
     }
 

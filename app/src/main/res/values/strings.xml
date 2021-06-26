@@ -46,4 +46,6 @@
     <string name="maps">Maps</string>
     <string name="pukul">Pukul</string>
     <string name="tanggal">Tanggal</string>
+    <string name="edit">Edit</string>
+    <string name="title_activity_maps_info">Map</string>
 </resources>
