@@ -23,7 +23,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -547,7 +546,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 locationRequestCode
             )
         } else {
-            Toast.makeText(this, "tidak", Toast.LENGTH_SHORT).show()
             ActivityCompat.requestPermissions(
                 this, arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION
