@@ -14,7 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
 import com.skripsi.presensigps.model.DataResponse
 import com.skripsi.presensigps.network.ApiClient
-import kotlinx.android.synthetic.main.activity_info.*
+import kotlinx.android.synthetic.main.activity_maps_info.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,9 +24,9 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var snackbar: Snackbar
     private lateinit var progressDialog: ProgressDialog
-    private var latLngList = ArrayList<LatLng>()
-    private var locationNameList = ArrayList<String>()
-    private lateinit var LatLngLocation: LatLng
+//    private var latLngList = ArrayList<LatLng>()
+//    private var locationNameList = ArrayList<String>()
+    private lateinit var latLngLocation: LatLng
     private lateinit var cameraUpdate: CameraUpdate
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,15 +63,15 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
         val status = intent.getStringExtra("status").toString()
 
         if (check) {
-            LatLngLocation = LatLng(latitude.toDouble(), longitude.toDouble())
+            latLngLocation = LatLng(latitude.toDouble(), longitude.toDouble())
             cameraUpdate = CameraUpdateFactory.newCameraPosition(
-                CameraPosition.builder().target(LatLngLocation)
+                CameraPosition.builder().target(latLngLocation)
                     .zoom(19f)
                     .build()
             )
             if (status == "1") {
                 mMap.addMarker(
-                    MarkerOptions().position(LatLngLocation).title(name)
+                    MarkerOptions().position(latLngLocation).title(name)
                         .icon(
                             BitmapDescriptorFactory.defaultMarker(
                                 BitmapDescriptorFactory.HUE_GREEN
@@ -80,7 +80,7 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
                 )
             } else {
                 mMap.addMarker(
-                    MarkerOptions().position(LatLngLocation).title(name)
+                    MarkerOptions().position(latLngLocation).title(name)
                 )
             }
             mMap.animateCamera(cameraUpdate)
@@ -99,7 +99,6 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
                 var message = "Sukses"
 
                 if (value.equals("1")) {
-
                     for (i in response.body()!!.result) {
 //                        latLngList.add(
 //                            LatLng(
@@ -108,10 +107,10 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
 //                            )
 //                        )
 //                        locationNameList.add(i.location_name)
-                        LatLngLocation = LatLng(i.latitude.toDouble(), i.longitude.toDouble())
+                        latLngLocation = LatLng(i.latitude.toDouble(), i.longitude.toDouble())
                         if (i.status == "1") {
                             mMap.addMarker(
-                                MarkerOptions().position(LatLngLocation).title(i.name)
+                                MarkerOptions().position(latLngLocation).title(i.name)
                                     .icon(
                                         BitmapDescriptorFactory.defaultMarker(
                                             BitmapDescriptorFactory.HUE_GREEN
@@ -120,12 +119,15 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
                             )
                         } else {
                             mMap.addMarker(
-                                MarkerOptions().position(LatLngLocation).title(i.name)
+                                MarkerOptions().position(latLngLocation).title(i.name)
                             )
                         }
                     }
                 } else {
                     message = "Gagal"
+                    snackbar =
+                        Snackbar.make(parentMapsInfoActivity, message, Snackbar.LENGTH_SHORT)
+                    snackbar.show()
                 }
                 progressDialog.dismiss()
             }
@@ -134,7 +136,7 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
                 progressDialog.dismiss()
 
                 snackbar =
-                    Snackbar.make(parentInfoActivity, t.message.toString(), Snackbar.LENGTH_SHORT)
+                    Snackbar.make(parentMapsInfoActivity, t.message.toString(), Snackbar.LENGTH_SHORT)
                 snackbar.show()
             }
         })

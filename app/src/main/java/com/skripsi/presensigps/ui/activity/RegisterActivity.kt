@@ -41,17 +41,14 @@ class RegisterActivity : AppCompatActivity() {
         val check:Boolean = intent.getBooleanExtra("cek",false)
         val id = intent.getStringExtra("id").toString()
         val name = intent.getStringExtra("name").toString()
-        val position = intent.getStringExtra("position").toString()
+//        val position = intent.getStringExtra("position").toString()
         val email = intent.getStringExtra("email").toString()
         val password = intent.getStringExtra("password").toString()
 
         if (check) {
             inputNamaLengkap.setText(name)
             inputJabatan.setAdapter(adapterPosition)
-            when(position){
-                "sales" -> inputJabatan.setText(itemPosition[0])
-                "manager" -> inputJabatan.setText(itemPosition[1])
-            }
+           //position/jabatan.setText
             inputEmail.setText(email)
             inputPassword.setText(password)
             btnDaftar.text = getString(R.string.edit)

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
@@ -47,6 +48,10 @@ class AdminActivity : AppCompatActivity() {
         tvName.text = sharedPref.getString(Constant.PREF_USER_NAME).toString()
         tvPosition.text = sharedPref.getString(Constant.PREF_USER_POSITION).toString()
 
+        if (sharedPref.getString(Constant.PREF_USER_POSITION)
+                .toString()=="manager") {
+            cardUser.visibility = View.INVISIBLE
+        }
         getInfoAdmin()
         btnOnClick()
     }
