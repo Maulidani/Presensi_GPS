@@ -3,8 +3,12 @@
 package com.skripsi.presensigps.ui.activity
 
 import android.app.ProgressDialog
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -24,17 +28,61 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var snackbar: Snackbar
     private lateinit var progressDialog: ProgressDialog
-//    private var latLngList = ArrayList<LatLng>()
+
+    //    private var latLngList = ArrayList<LatLng>()
 //    private var locationNameList = ArrayList<String>()
     private lateinit var latLngLocation: LatLng
     private lateinit var cameraUpdate: CameraUpdate
 
+    private var check: Boolean? = null
+    private var latitude: String? = null
+    private var longitude: String? = null
+    private var name: String? = null
+    private var status: String? = null
+    private var location: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps_info)
-
         supportActionBar?.title = "Laporan"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        check = intent.getBooleanExtra("cek", false)
+        latitude = intent.getStringExtra("latitude").toString()
+        longitude = intent.getStringExtra("longitude").toString()
+        name = intent.getStringExtra("name").toString()
+        status = intent.getStringExtra("status").toString()
+        location = intent.getStringExtra("location").toString()
+        val img = intent.getStringExtra("img").toString()
+        val date = intent.getStringExtra("date").toString()
+        val time = intent.getStringExtra("time").toString()
+        val notes = intent.getStringExtra("notes").toString()
+
+        if (check == true) {
+            parentDetails.visibility = View.VISIBLE
+            Glide.with(this)
+                .load(img)
+                .into(imgReport)
+            tvName.text = name
+            tvLocation.text = location
+            tvLatitude.text = latitude
+            tvLongitude.text = longitude
+            tvDate.text = date
+            tvTime.text = time
+            inputNotes.setText(notes)
+            if (status == "1") {
+                btnVerifikasi.text = getString(R.string.telah_diverifikasi)
+                btnVerifikasi.setTextColor(
+                    ContextCompat.getColor(
+                        this,
+                        R.color.dark_green
+                    )
+                )
+            } else {
+                btnVerifikasi.text = getString(R.string.verifikasi)
+                btnVerifikasi.setTextColor(Color.BLACK)
+            }
+        }
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.mapInfo) as SupportMapFragment
@@ -56,14 +104,8 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
         )
         mMap.animateCamera(cameraUpdate)
 
-        val check: Boolean = intent.getBooleanExtra("cek", false)
-        val latitude = intent.getStringExtra("latitude").toString()
-        val longitude = intent.getStringExtra("longitude").toString()
-        val name = intent.getStringExtra("name").toString()
-        val status = intent.getStringExtra("status").toString()
-
-        if (check) {
-            latLngLocation = LatLng(latitude.toDouble(), longitude.toDouble())
+        if (check == true) {
+            latLngLocation = LatLng(latitude!!.toDouble(), longitude!!.toDouble())
             cameraUpdate = CameraUpdateFactory.newCameraPosition(
                 CameraPosition.builder().target(latLngLocation)
                     .zoom(19f)
@@ -93,7 +135,7 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun getReportLatLnt() {
         progressDialog.show()
 
-        ApiClient.instance.getReport().enqueue(object : Callback<DataResponse> {
+        ApiClient.instance.getReport("").enqueue(object : Callback<DataResponse> {
             override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
                 val value = response.body()?.value
                 var message = "Sukses"
@@ -136,7 +178,11 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
                 progressDialog.dismiss()
 
                 snackbar =
-                    Snackbar.make(parentMapsInfoActivity, t.message.toString(), Snackbar.LENGTH_SHORT)
+                    Snackbar.make(
+                        parentMapsInfoActivity,
+                        t.message.toString(),
+                        Snackbar.LENGTH_SHORT
+                    )
                 snackbar.show()
             }
         })

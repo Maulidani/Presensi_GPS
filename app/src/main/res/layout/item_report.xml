@@ -202,53 +202,6 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@id/notesTextField" />
 
-
-            <!--            <TextView-->
-            <!--                android:id="@+id/tvLocation"-->
-            <!--                android:layout_width="0dp"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_marginStart="24dp"-->
-            <!--                android:layout_marginTop="8dp"-->
-            <!--                app:layout_constraintBottom_toTopOf="@id/tvLatitude"-->
-            <!--                app:layout_constraintLeft_toRightOf="@id/imgReport"-->
-            <!--                app:layout_constraintRight_toRightOf="parent"-->
-            <!--                app:layout_constraintTop_toBottomOf="@id/tvName2"-->
-            <!--                tools:text="PT Lapi Laboratories Cabang Makassar Indonesia" />-->
-
-
-            <!--            <TextView-->
-            <!--                android:id="@+id/tvDate"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_marginStart="24dp"-->
-            <!--                android:layout_marginTop="8dp"-->
-            <!--                app:layout_constraintBottom_toBottomOf="@id/imgReport"-->
-            <!--                app:layout_constraintLeft_toRightOf="@id/imgReport"-->
-            <!--                app:layout_constraintTop_toBottomOf="@id/tvLatitude"-->
-            <!--                tools:text="20021-06-13" />-->
-
-            <!--            <TextView-->
-            <!--                android:id="@+id/tvTime"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_marginStart="12dp"-->
-            <!--                app:layout_constraintBottom_toBottomOf="@id/tvDate"-->
-            <!--                app:layout_constraintLeft_toRightOf="@id/tvDate"-->
-            <!--                app:layout_constraintTop_toTopOf="@id/tvDate"-->
-            <!--                tools:text="12:00:00" />-->
-
-            <!--            <TextView-->
-            <!--                android:id="@+id/tvNotes"-->
-            <!--                android:layout_width="0dp"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:layout_marginTop="8dp"-->
-            <!--                app:layout_constraintBottom_toTopOf="@id/btnVerifikasi"-->
-            <!--                app:layout_constraintLeft_toLeftOf="parent"-->
-            <!--                app:layout_constraintRight_toRightOf="parent"-->
-            <!--                app:layout_constraintTop_toBottomOf="@id/tvDate"-->
-            <!--                tools:text="Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla Bla " />-->
-
-
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -15,6 +15,7 @@
     <string name="nama_lengkap">Nama Lengkap</string>
     <string name="title_activity_maps">Map</string>
     <string name="hadir">Hadir</string>
+    <string name="pulang">Pulang</string>
     <string name="profil_saya">Profil Saya</string>
     <string name="tentang">Tentang</string>
     <string name="ok">OK</string>
@@ -48,4 +49,7 @@
     <string name="tanggal">Tanggal</string>
     <string name="edit">Edit</string>
     <string name="title_activity_maps_info">Map</string>
+    <string name="hari_ini">Hari Ini</string>
+    <string name="semua">Semua</string>
+    <string name="tidak_ada_laporan_hari_ini">Tidak Ada Laporan Hari ini</string>
 </resources>

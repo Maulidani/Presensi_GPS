@@ -106,33 +106,29 @@ class ReportAdapter(
                 notifyDataSetChanged()
             }
 
-            itemView.cardReport.setOnLongClickListener {
-                if (positions == "admin") {
-                    optionAlert(itemView, dataResult.id, dataResult)
-                }
-                true
-            }
-
             itemView.parentNameList.setOnLongClickListener {
                 if (positions == "admin") {
-                    optionAlert(itemView, dataResult.id, dataResult)
+                    optionAlert(itemView, dataResult)
                 }
                 true
             }
 
             itemView.parentDetails.setOnClickListener {
-                if (positions == "manager") {
                     ContextCompat.startActivity(
                         itemView.context,
                         Intent(itemView.context, MapsInfoActivity::class.java)
                             .putExtra("cek", true)
+                            .putExtra("name", dataResult.name)
+                            .putExtra("img", dataResult.img)
+                            .putExtra("location", dataResult.location_name)
                             .putExtra("latitude", dataResult.latitude)
                             .putExtra("longitude", dataResult.longitude)
-                            .putExtra("name", dataResult.name)
+                            .putExtra("date", dataResult.date)
+                            .putExtra("time", dataResult.time)
+                            .putExtra("notes", dataResult.notes)
                             .putExtra("status", dataResult.status),
                         null
                     )
-                }
             }
         }
     }
@@ -205,37 +201,14 @@ class ReportAdapter(
             })
     }
 
-    private fun delete(itemView: View, id: String, dataResult: Result) {
-        val type = "report"
-        ApiClient.instance.delete(id, type).enqueue(object : Callback<DataResponse> {
-            override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
-                val value = response.body()?.value
-
-                if (value.equals("1")) {
-
-                    mListener.refreshView(dataResult, true, type)
-                }
-
-            }
-
-            override fun onFailure(call: Call<DataResponse>, t: Throwable) {
-
-                notifyDataSetChanged()
-                Toast.makeText(itemView.context, t.message.toString(), Toast.LENGTH_SHORT)
-                    .show()
-            }
-
-        })
-    }
-
-    private fun optionAlert(itemView: View, id: String, dataResult: Result) {
+    private fun optionAlert(itemView: View, dataResult: Result) {
         val options: Array<String>
         val builder: AlertDialog.Builder = AlertDialog.Builder(itemView.context)
         builder.setTitle("Aksi")
 
         if (positions == "admin") {
             if (dataResult.status == "1") {
-                options = arrayOf("Lihat lokasi", "Batalkan verifikasi", "Hapus laporan")
+                options = arrayOf("Lihat lokasi", "Batalkan verifikasi")
                 builder.setItems(
                     options
                 ) { _, which ->
@@ -245,19 +218,23 @@ class ReportAdapter(
                                 itemView.context,
                                 Intent(itemView.context, MapsInfoActivity::class.java)
                                     .putExtra("cek", true)
+                                    .putExtra("name", dataResult.name)
+                                    .putExtra("img", dataResult.img)
+                                    .putExtra("location", dataResult.location_name)
                                     .putExtra("latitude", dataResult.latitude)
                                     .putExtra("longitude", dataResult.longitude)
-                                    .putExtra("name", dataResult.name)
+                                    .putExtra("date", dataResult.date)
+                                    .putExtra("time", dataResult.time)
+                                    .putExtra("notes", dataResult.notes)
                                     .putExtra("status", dataResult.status),
                                 null
                             )
                         }
                         1 -> reportCancelVerification(dataResult.id, itemView, dataResult)
-                        2 -> deleteAlert(itemView, id, dataResult)
                     }
                 }
             } else {
-                options = arrayOf("Lihat lokasi", "Hapus laporan")
+                options = arrayOf("Lihat lokasi")
                 builder.setItems(
                     options
                 ) { _, which ->
@@ -267,13 +244,18 @@ class ReportAdapter(
                                 itemView.context,
                                 Intent(itemView.context, MapsInfoActivity::class.java)
                                     .putExtra("cek", true)
+                                    .putExtra("name", dataResult.name)
+                                    .putExtra("img", dataResult.img)
+                                    .putExtra("location", dataResult.location_name)
                                     .putExtra("latitude", dataResult.latitude)
                                     .putExtra("longitude", dataResult.longitude)
-                                    .putExtra("name", dataResult.name),
+                                    .putExtra("date", dataResult.date)
+                                    .putExtra("time", dataResult.time)
+                                    .putExtra("notes", dataResult.notes)
+                                    .putExtra("status", dataResult.status),
                                 null
                             )
                         }
-                        1 -> deleteAlert(itemView, id, dataResult)
                     }
                 }
             }
@@ -282,21 +264,6 @@ class ReportAdapter(
 
         val dialog: AlertDialog = builder.create()
         dialog.show()
-    }
-
-    private fun deleteAlert(itemView: View, id: String, dataResult: Result) {
-        val builder = AlertDialog.Builder(itemView.context)
-        builder.setTitle("Hapus")
-        builder.setMessage("Hapus laporan ?")
-
-        builder.setPositiveButton("Ya") { _, _ ->
-            delete(itemView, id, dataResult)
-        }
-
-        builder.setNegativeButton("Tidak") { _, _ ->
-            // cancel
-        }
-        builder.show()
     }
 
     interface IUserRecycler {

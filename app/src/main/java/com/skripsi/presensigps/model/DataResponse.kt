@@ -24,7 +24,13 @@ data class DataResponse(
     val total_presence: String,
     val total_report: String,
     val total_user: String,
-    val time: String
+    val time: String,
+
+    val status: String,
+
+    val img: String,
+
+    val date: String
 )
 
 data class Result(

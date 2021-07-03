@@ -23,6 +23,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -69,6 +70,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var latLngList = ArrayList<LatLng>()
     private var locationNameList = ArrayList<String>()
+    private var reportStatus = ArrayList<String>()
 
     private var myLocLatitude: Double? = null
     private var myLocLongitude: Double? = null
@@ -145,8 +147,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
-
-        getUpdateLatLng()
+        GlobalScope.launch(context = Dispatchers.Main) {
+            getUserStatus()
+//            getUpdateLatLng()
+        }
 
         progressDialog = ProgressDialog(this)
         progressDialog.setTitle("Loading")
@@ -215,19 +219,23 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         btnPresent.setOnClickListener {
             typeOnCLick = "presence"
 
-            if (distance <= radius) {
+            if (btnPresent.text == getString(R.string.pulang)) {
+                presenceBack()
+            } else if (btnPresent.text == getString(R.string.hadir)) {
+                if (distance <= radius) {
 
-                btnPresent.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_green))
-                openCamera()
+                    btnPresent.setBackgroundColor(ContextCompat.getColor(this, R.color.dark_green))
+                    openCamera()
 
-            } else {
-                btnPresent.setBackgroundColor(Color.GRAY)
-                snackbar = Snackbar.make(
-                    parentMapsActivity,
-                    "Anda Tidak Masuk Area Kantor" ,
-                    Snackbar.LENGTH_SHORT
-                )
-                snackbar.show()
+                } else {
+                    btnPresent.setBackgroundColor(Color.GRAY)
+                    snackbar = Snackbar.make(
+                        parentMapsActivity,
+                        "Anda Tidak Masuk Area Kantor",
+                        Snackbar.LENGTH_SHORT
+                    )
+                    snackbar.show()
+                }
             }
         }
     }
@@ -236,7 +244,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         latOffice = sharedPref.getString(Constant.PREF_OFFICE_LATITUDE)?.toDouble()
         longOffice = sharedPref.getString(Constant.PREF_OFFICE_LONGITUDE)?.toDouble()
-        radius = sharedPref.getString(Constant.PREF_OFFICE_RADIUS)!!.toDouble()
+//        radius = sharedPref.getString(Constant.PREF_OFFICE_RADIUS)!!.toDouble()
+        radius = 100000.0
 
         val myLocation = LatLng(latitude, longitude)
         val officeLocation = LatLng(latOffice!!, longOffice!!)
@@ -251,25 +260,32 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap.clear()
         mMap.addMarker(MarkerOptions().position(myLocation).title("Lokasi Saya"))
 
-        var whileLoop: Boolean
-        var iName = 0
-        for (i in latLngList) {
-            updateLatLng = LatLng(i.latitude, i.longitude)
-
-            whileLoop = true
-            while (whileLoop) {
-                mMap.addMarker(
-                    MarkerOptions().position(updateLatLng).title(locationNameList[iName])
-                        .icon(
-                            BitmapDescriptorFactory.defaultMarker(
-                                BitmapDescriptorFactory.HUE_GREEN
-                            )
-                        )
-                )
-                iName += 1
-                whileLoop = false
-            }
-        }
+//        var whileLoop: Boolean
+//        var index = 0
+//        for (i in latLngList) {
+//            updateLatLng = LatLng(i.latitude, i.longitude)
+//
+//            whileLoop = true
+//            while (whileLoop) {
+//                if (reportStatus[index] == "1") {
+//                    mMap.addMarker(
+//                        MarkerOptions().position(updateLatLng).title(locationNameList[index])
+//                            .icon(
+//                                BitmapDescriptorFactory.defaultMarker(
+//                                    BitmapDescriptorFactory.HUE_GREEN
+//                                )
+//                            )
+//                    )
+//                } else {
+//                    mMap.addMarker(
+//                        MarkerOptions().position(updateLatLng).title(locationNameList[index])
+//                    )
+//                }
+//
+//                index += 1
+//                whileLoop = false
+//            }
+//        }
 
         val circleOptions = CircleOptions()
         circleOptions.center(officeLocation)
@@ -315,6 +331,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         tvKetStatus.text = applicationContext.getString(R.string.presensi_berhasil)
                         btnReport.visibility = View.INVISIBLE
                         btnPresent.visibility = View.INVISIBLE
+                        btnPresent.text = getString(R.string.pulang)
                         cardDialog.visibility = View.VISIBLE
                         cardDialog.animation =
                             AnimationUtils.loadAnimation(this@MapsActivity, R.anim.load)
@@ -352,68 +369,142 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getUpdateLatLng() {
-        GlobalScope.launch(context = Dispatchers.Main) {
+        ApiClient.instance.getUpdateLatlngReport(sharedPref.getString(Constant.PREF_USER_ID)!!)
+            .enqueue(object : Callback<DataResponse> {
+                override fun onResponse(
+                    call: Call<DataResponse>,
+                    response: Response<DataResponse>
+                ) {
+                    val value = response.body()?.value
+                    val message:String
 
-            ApiClient.instance.getUpdateLatlngReport(sharedPref.getString(Constant.PREF_USER_ID)!!)
-                .enqueue(object : Callback<DataResponse> {
-                    override fun onResponse(
-                        call: Call<DataResponse>,
-                        response: Response<DataResponse>
-                    ) {
-                        val value = response.body()?.value
-                        var message = "Update"
+                    if (value.equals("1")) {
+                        latLngList.clear()
+                        locationNameList.clear()
+                        reportStatus.clear()
 
-                        if (value.equals("1")) {
-                            latLngList.clear()
-                            locationNameList.clear()
-
-                            for (i in response.body()!!.result) {
-                                latLngList.add(
-                                    LatLng(
-                                        i.latitude.toDouble(),
-                                        i.longitude.toDouble()
-                                    )
+                        for (i in response.body()!!.result) {
+                            latLngList.add(
+                                LatLng(
+                                    i.latitude.toDouble(),
+                                    i.longitude.toDouble()
                                 )
-                                updateLatLng = LatLng(i.latitude.toDouble(), i.longitude.toDouble())
+                            )
+                            updateLatLng = LatLng(i.latitude.toDouble(), i.longitude.toDouble())
 
+                            if (i.status == "1") {
                                 mMap.addMarker(
-                                    MarkerOptions().position(updateLatLng).title(i.location_name)
+                                    MarkerOptions().position(updateLatLng)
+                                        .title(i.location_name)
                                         .icon(
                                             BitmapDescriptorFactory.defaultMarker(
                                                 BitmapDescriptorFactory.HUE_GREEN
                                             )
                                         )
                                 )
-
-                                locationNameList.add(i.location_name)
+                            } else {
+                                mMap.addMarker(
+                                    MarkerOptions().position(updateLatLng)
+                                        .title(i.location_name)
+                                )
                             }
-                            snackbar = Snackbar.make(
-                                parentMapsActivity,
-                                message,
-                                Snackbar.LENGTH_SHORT
-                            )
-                            snackbar.show()
-                        } else {
-                            message = "Gagal Update"
-                            snackbar = Snackbar.make(
-                                parentMapsActivity,
-                                message,
-                                Snackbar.LENGTH_SHORT
-                            )
-                            snackbar.show()
-                        }
-                    }
 
-                    override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                            locationNameList.add(i.location_name)
+                            reportStatus.add(i.status)
+                        }
+                    } else {
+                        message = "Gagal Update"
                         snackbar = Snackbar.make(
                             parentMapsActivity,
-                            t.message.toString(),
+                            message,
                             Snackbar.LENGTH_SHORT
                         )
                         snackbar.show()
                     }
-                })
-        }
+                }
+
+                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                    snackbar = Snackbar.make(
+                        parentMapsActivity,
+                        t.message.toString(),
+                        Snackbar.LENGTH_SHORT
+                    )
+                    snackbar.show()
+                }
+            })
+    }
+
+    private fun getUserStatus() {
+        ApiClient.instance.getUser(sharedPref.getString(Constant.PREF_USER_ID).toString())
+            .enqueue(object : Callback<DataResponse> {
+                override fun onResponse(
+                    call: Call<DataResponse>,
+                    response: Response<DataResponse>
+                ) {
+                    val status = response.body()?.status
+                    val value = response.body()?.value
+                    val message = response.body()?.message
+
+                    if (value.equals("1")) {
+
+                        if (status == "1") btnPresent.text = getString(R.string.pulang)
+                        else if (status == "0") btnPresent.text = getString(R.string.hadir)
+
+                    } else {
+                        snackbar = Snackbar.make(
+                            parentMapsActivity,
+                            message.toString(),
+                            Snackbar.LENGTH_SHORT
+                        )
+                        snackbar.show()
+                    }
+                }
+
+                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                    snackbar = Snackbar.make(
+                        parentMapsActivity,
+                        t.message.toString(),
+                        Snackbar.LENGTH_SHORT
+                    )
+                    snackbar.show()
+                }
+            })
+    }
+
+    private fun presenceBack() {
+        ApiClient.instance.presenceBack(sharedPref.getString(Constant.PREF_USER_ID).toString())
+            .enqueue(object : Callback<DataResponse> {
+                override fun onResponse(
+                    call: Call<DataResponse>,
+                    response: Response<DataResponse>
+                ) {
+                    val value = response.body()?.value
+                    val message = response.body()?.message
+
+                    if (value.equals("1")) {
+                        btnPresent.text = getString(R.string.hadir)
+                        Toast.makeText(this@MapsActivity, "Presensi pulang sukses", Toast.LENGTH_SHORT).show()
+
+                    } else {
+                        snackbar = Snackbar.make(
+                            parentMapsActivity,
+                            message.toString(),
+                            Snackbar.LENGTH_SHORT
+                        )
+                        snackbar.show()
+                    }
+                }
+
+                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                    snackbar = Snackbar.make(
+                        parentMapsActivity,
+                        t.message.toString(),
+                        Snackbar.LENGTH_SHORT
+                    )
+                    snackbar.show()
+                }
+
+            })
     }
 
     private fun report(
@@ -445,7 +536,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 if (value.equals("1")) {
                     cardReport.visibility = View.INVISIBLE
 
-                    getUpdateLatLng()
+//                    getUpdateLatLng()
 
                     imgStatus.setImageResource(R.drawable.ic_success)
                     tvStatus.text = applicationContext.getString(R.string.success)

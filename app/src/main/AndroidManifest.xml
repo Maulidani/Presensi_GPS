@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.skripsi.presensigps">
-
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -19,6 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PresensiGPS"
         android:usesCleartextTraffic="true">
+        <activity android:name=".ui.activity.DetailPresenceActivity"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -30,7 +30,7 @@
         <activity
             android:name=".ui.activity.MapsInfoActivity"
             android:label="@string/title_activity_maps_info"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.RegisterActivity"
             android:screenOrientation="portrait" />
@@ -44,12 +44,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.InfoActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ui.activity.InfoActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.AdminActivity"
             android:label="@string/title_activity_admin"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.activity.AboutActivity"
             android:screenOrientation="portrait" />
