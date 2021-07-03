@@ -47,7 +47,6 @@ class DetailPresenceActivity : AppCompatActivity() {
         ApiClient.instance.getDetailPresence(id).enqueue(object : Callback<DataResponse> {
             override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
                 val value = response.body()?.value
-                val message = response.body()?.message
 
                 if (value == "1") {
                     Glide.with(this@DetailPresenceActivity)
