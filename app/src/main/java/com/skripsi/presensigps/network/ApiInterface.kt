@@ -102,6 +102,11 @@ interface ApiInterface {
         @Query("name") id: String
     ): Call<DataResponse>
 
+    @GET("get_report_for_pdf.php")
+    fun getReportPDF(
+        @Query("when") sWhen: String
+    ): Call<DataResponse>
+
     @FormUrlEncoded
     @POST("delete.php")
     fun delete(

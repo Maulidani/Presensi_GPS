@@ -94,21 +94,18 @@ class PDFReportActivity : AppCompatActivity() {
         paint.style = Paint.Style.FILL
         canvas.drawText("No.", 40f, 830f, paint)
         canvas.drawText("Nama", 150f, 830f, paint)
-        canvas.drawText("Datang", 650f, 830f, paint)
-        canvas.drawText("Pulang", 850f, 830f, paint)
+        canvas.drawText("Datang", 700f, 830f, paint)
         canvas.drawText("Ket.", 1050f, 830f, paint)
         canvas.drawLine(130f, 790f, 130f, 840f, paint)
-        canvas.drawLine(630f, 790f, 630f, 840f, paint)
-        canvas.drawLine(830f, 790f, 830f, 840f, paint)
+        canvas.drawLine(680f, 790f, 680f, 840f, paint)
         canvas.drawLine(1030f, 790f, 1030f, 840f, paint)
 
         var y = 950
         for (i in 1..4) {
             canvas.drawText("$i.", 40f, y.toFloat(), paint)
             canvas.drawText("Sendy", 150f, y.toFloat(), paint)
-            canvas.drawText("08:15:00", 650f, y.toFloat(), paint)
-            canvas.drawText("20:00:00", 850f, y.toFloat(), paint)
-             canvas.drawText("--", 1100f, y.toFloat(), paint)
+            canvas.drawText("08:15:00", 700f, y.toFloat(), paint)
+            canvas.drawText("--", 1100f, y.toFloat(), paint)
 
             y += 100
         }

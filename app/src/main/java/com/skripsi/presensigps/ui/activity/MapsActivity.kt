@@ -27,6 +27,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -220,7 +221,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             typeOnCLick = "presence"
 
             if (btnPresent.text == getString(R.string.pulang)) {
-                presenceBack()
+
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle("Presensi")
+                builder.setMessage("Presensi Untuk Pulang")
+
+                builder.setPositiveButton("Ya") { _, _ ->
+                    presenceBack()
+                }
+
+                builder.setNegativeButton("Tidak") { _, _ ->
+                    // cancel
+                }
+                builder.show()
+
             } else if (btnPresent.text == getString(R.string.hadir)) {
                 if (distance <= radius) {
 
@@ -376,7 +390,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     response: Response<DataResponse>
                 ) {
                     val value = response.body()?.value
-                    val message:String
+                    val message: String
 
                     if (value.equals("1")) {
                         latLngList.clear()
@@ -483,7 +497,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     if (value.equals("1")) {
                         btnPresent.text = getString(R.string.hadir)
-                        Toast.makeText(this@MapsActivity, "Presensi pulang sukses", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@MapsActivity,
+                            "Presensi pulang sukses",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
                     } else {
                         snackbar = Snackbar.make(

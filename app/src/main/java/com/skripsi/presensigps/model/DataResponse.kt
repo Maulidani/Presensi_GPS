@@ -49,5 +49,7 @@ data class Result(
     val time: String,
     val status: String,
 
+    val jumlah: String,
+
     var expendable: Boolean = false
 )

@@ -2,15 +2,26 @@
 
 package com.skripsi.presensigps.ui.activity
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.pdf.PdfDocument
 import android.os.Bundle
+import android.os.Environment
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
@@ -28,6 +39,12 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapter.IUserRecycler {
     private lateinit var lLayoutManager: LinearLayoutManager
@@ -37,9 +54,33 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
     private lateinit var uAdapter: UserAdapter
     private lateinit var snackbar: Snackbar
     private lateinit var progressDialog: ProgressDialog
+    private lateinit var progressDialogCetak: ProgressDialog
     private lateinit var type: String
     private var admin: Boolean? = null
     private var onUpdate: Boolean = false
+
+    private lateinit var scaleBitmap: Bitmap
+    private lateinit var bitmap: Bitmap
+    private val pageWidth = 1200
+    private val pageHeight = 2400
+    private lateinit var dateTime: Date
+    private lateinit var dateFormat: DateFormat
+    private val itemCetak = listOf(
+        "hari ini",
+        "januari",
+        "februari",
+        "maret",
+        "april",
+        "mei",
+        "juni",
+        "juli",
+        "agustus",
+        "september",
+        "oktober",
+        "november",
+        "desember",
+        "semua"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -292,6 +333,171 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
         })
     }
 
+    private fun printReport(whenReport: String, sWhen: String) {
+        progressDialogCetak = ProgressDialog(this)
+        progressDialogCetak.setTitle("Loading")
+        progressDialogCetak.setMessage("Memuat Informasi...")
+        progressDialogCetak.setCancelable(false)
+        progressDialogCetak.show()
+
+        ApiClient.instance.getReportPDF(whenReport).enqueue(object : Callback<DataResponse> {
+            override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
+                val value = response.body()?.value
+                val result = response.body()?.result
+                var message = "Sukses"
+
+                if (value.equals("1")) {
+                    if (!result.isNullOrEmpty()) {
+                        if (whenReport == "today") {
+                            createPDF(result, whenReport, sWhen)
+                        } else {
+                            createPDF(result, whenReport, sWhen)
+                        }
+                    } else {
+                        snackbar =
+                            Snackbar.make(
+                                parentInfoActivity,
+                                "Belum ada laporan",
+                                Snackbar.LENGTH_SHORT
+                            )
+                        snackbar.show()
+
+                        progressDialog.dismiss()
+                    }
+                } else {
+                    message = "Gagal"
+
+                    snackbar =
+                        Snackbar.make(parentInfoActivity, message, Snackbar.LENGTH_SHORT)
+                    snackbar.show()
+
+                    progressDialog.dismiss()
+                }
+                progressDialogCetak.dismiss()
+                cardCetak.visibility = View.INVISIBLE
+            }
+
+            override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                progressDialogCetak.dismiss()
+                snackbar =
+                    Snackbar.make(parentInfoActivity, t.message.toString(), Snackbar.LENGTH_SHORT)
+                snackbar.show()
+                cardCetak.visibility = View.INVISIBLE
+            }
+
+        })
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun createPDF(result: ArrayList<Result>, whenReport: String, sWhen: String) {
+        dateTime = Date()
+
+        val pdfDocument = PdfDocument()
+        val paint = Paint()
+
+        val pageInfo = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, 1).create()
+        val page = pdfDocument.startPage(pageInfo)
+
+        val canvas = page.canvas
+        canvas.drawBitmap(scaleBitmap, 0f, 0f, paint)
+
+        paint.textAlign = Paint.Align.LEFT
+        paint.color = Color.BLACK
+        paint.textSize = 35f
+        canvas.drawText("Nama: " + "Admin Lapi", 20f, 590f, paint)
+
+        paint.textAlign = Paint.Align.RIGHT
+        dateFormat = SimpleDateFormat("dd/MM/yy")
+        canvas.drawText(
+            "Tanggal: " + dateFormat.format(dateTime),
+            (pageWidth - 20).toFloat(),
+            590f,
+            paint
+        )
+        dateFormat = SimpleDateFormat("HH:mm:ss")
+        canvas.drawText(
+            "Pukul: " + dateFormat.format(dateTime),
+            (pageWidth - 20).toFloat(),
+            640f,
+            paint
+        )
+
+        canvas.drawText(
+            "laporan: $sWhen",
+            (pageWidth - 20).toFloat(),
+            690f,
+            paint
+        )
+
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        canvas.drawRect(20f, 780f, (pageWidth - 20).toFloat(), 860f, paint)
+
+        paint.textAlign = Paint.Align.LEFT
+        paint.style = Paint.Style.FILL
+
+        var y = 950
+
+        if (whenReport == "today") {
+            canvas.drawText("No.", 40f, 830f, paint)
+            canvas.drawText("Nama", 150f, 830f, paint)
+            canvas.drawText("Datang", 700f, 830f, paint)
+            canvas.drawText("Ket.", 1050f, 830f, paint)
+            canvas.drawLine(130f, 790f, 130f, 840f, paint)
+            canvas.drawLine(680f, 790f, 680f, 840f, paint)
+            canvas.drawLine(1030f, 790f, 1030f, 840f, paint)
+
+            var no = 1
+            for (i in result) {
+                canvas.drawText(no.toString(), 40f, y.toFloat(), paint)
+                canvas.drawText(i.name, 150f, y.toFloat(), paint)
+                canvas.drawText(i.time, 700f, y.toFloat(), paint)
+                canvas.drawText("--", 1100f, y.toFloat(), paint)
+
+                no += 1
+                y += 100
+            }
+        } else {
+            canvas.drawText("No.", 40f, 830f, paint)
+            canvas.drawText("Nama", 150f, 830f, paint)
+            canvas.drawText("Jumlah Hadir", 700f, 830f, paint)
+            canvas.drawText("Ket.", 1050f, 830f, paint)
+            canvas.drawLine(130f, 790f, 130f, 840f, paint)
+            canvas.drawLine(680f, 790f, 680f, 840f, paint)
+            canvas.drawLine(1030f, 790f, 1030f, 840f, paint)
+
+            var no = 1
+            for (i in result) {
+                canvas.drawText(no.toString(), 40f, y.toFloat(), paint)
+                canvas.drawText(i.name, 150f, y.toFloat(), paint)
+                canvas.drawText(i.jumlah, 700f, y.toFloat(), paint)
+                canvas.drawText("--", 1100f, y.toFloat(), paint)
+
+                no += 1
+                y += 100
+            }
+
+        }
+
+        pdfDocument.finishPage(page)
+        val date = SimpleDateFormat("dd_MM_yy")
+        val time = SimpleDateFormat("HH_mm_ss")
+
+        val file = File(
+            Environment.getExternalStorageDirectory(),
+            "/sales_laporan_tgl_${date.format(dateTime)}_pkl_${time.format(dateTime)}.pdf"
+        )
+
+        try {
+            pdfDocument.writeTo(FileOutputStream(file))
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        pdfDocument.close()
+        Toast.makeText(this, "Periksa file manager anda", Toast.LENGTH_LONG).show()
+    }
+
     override fun onStart() {
         super.onStart()
 
@@ -301,8 +507,22 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
                 presence()
             }
             "report" -> {
+                bitmap = BitmapFactory.decodeResource(resources, R.drawable.logo_header)
+                scaleBitmap = Bitmap.createScaledBitmap(bitmap, pageWidth, 518, false)
+
+                ActivityCompat.requestPermissions(
+                    this, arrayOf(
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ), PackageManager.PERMISSION_GRANTED
+                )
+
                 supportActionBar?.title = "Laporan"
+
+                val adapterCetak = ArrayAdapter(this, R.layout.list_dropdown, itemCetak)
+                inputCetak.setAdapter(adapterCetak)
+
                 rvToday.visibility = View.VISIBLE
+                tvCetak.visibility = View.VISIBLE
                 tvToday.visibility = View.VISIBLE
                 tvAll.visibility = View.VISIBLE
 
@@ -310,6 +530,34 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
                 rvToday.layoutManager = lLayoutManagerToday
                 rvToday.setHasFixedSize(true)
                 report()
+
+                tvCetak.setOnClickListener {
+                    cardCetak.visibility = View.VISIBLE
+                }
+
+                btnCetak.setOnClickListener {
+                    val sWhen = inputCetak.text.toString()
+                    var whenReport = ""
+                    when (sWhen) {
+                        "hari ini" -> whenReport = "today"
+                        "januari" -> whenReport = "01"
+                        "februari" -> whenReport = "02"
+                        "maret" -> whenReport = "03"
+                        "april" -> whenReport = "04"
+                        "mei" -> whenReport = "05"
+                        "juni" -> whenReport = "06"
+                        "juli" -> whenReport = "07"
+                        "agustus" -> whenReport = "08"
+                        "september" -> whenReport = "09"
+                        "oktober" -> whenReport = "10"
+                        "november" -> whenReport = "11"
+                        "desember" -> whenReport = "12"
+                        "semua" -> whenReport = ""
+                    }
+
+                    if (sWhen == "") inputCetak.error = "Pilih terlebih dahulu"
+                    else printReport(whenReport, sWhen)
+                }
             }
             "user" -> {
                 supportActionBar?.title = "Akun"
@@ -345,7 +593,6 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
             R.id.itemAdd -> {
                 startActivity(Intent(this, RegisterActivity::class.java))
                 return true
-
             }
         }
         return super.onOptionsItemSelected(item)
