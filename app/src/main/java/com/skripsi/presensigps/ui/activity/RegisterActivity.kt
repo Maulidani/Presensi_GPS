@@ -21,7 +21,7 @@ import retrofit2.Response
 
 class RegisterActivity : AppCompatActivity() {
     private lateinit var snackbar: Snackbar
-    private val itemPosition = listOf("sales", "manager")
+    private val itemPosition = listOf("sales", "manager", "admin")
     private lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {

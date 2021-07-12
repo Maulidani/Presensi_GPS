@@ -604,7 +604,13 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
         super.onResume()
         when (type) {
             "presence" -> presence()
-            "report" -> report()
+            "report" -> {
+                val adapterCetak = ArrayAdapter(this, R.layout.list_dropdown, itemCetak)
+                inputCetak.setAdapter(adapterCetak)
+                val adapterYear = ArrayAdapter(this, R.layout.list_dropdown, itemYear)
+                inputYear.setAdapter(adapterYear)
+                report()
+            }
             "user" -> user()
         }
     }

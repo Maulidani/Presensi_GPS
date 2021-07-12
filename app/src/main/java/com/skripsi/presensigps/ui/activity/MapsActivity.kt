@@ -258,7 +258,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         latOffice = sharedPref.getString(Constant.PREF_OFFICE_LATITUDE)?.toDouble()
         longOffice = sharedPref.getString(Constant.PREF_OFFICE_LONGITUDE)?.toDouble()
-        radius = sharedPref.getString(Constant.PREF_OFFICE_RADIUS)!!.toDouble()
+
+        if (!sharedPref.getString(Constant.PREF_OFFICE_RADIUS).isNullOrEmpty()) {
+            radius = sharedPref.getString(Constant.PREF_OFFICE_RADIUS)!!.toDouble()
+        }
 //        radius = 100000.0
 
         val myLocation = LatLng(latitude, longitude)
