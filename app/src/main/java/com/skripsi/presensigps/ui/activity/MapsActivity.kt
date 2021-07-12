@@ -258,11 +258,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         latOffice = sharedPref.getString(Constant.PREF_OFFICE_LATITUDE)?.toDouble()
         longOffice = sharedPref.getString(Constant.PREF_OFFICE_LONGITUDE)?.toDouble()
-//        radius = sharedPref.getString(Constant.PREF_OFFICE_RADIUS)!!.toDouble()
-        radius = 100000.0
+        radius = sharedPref.getString(Constant.PREF_OFFICE_RADIUS)!!.toDouble()
+//        radius = 100000.0
 
         val myLocation = LatLng(latitude, longitude)
-        val officeLocation = LatLng(latOffice!!, longOffice!!)
+        val officeLocation = latOffice?.let { longOffice?.let { it1 -> LatLng(it, it1) } }
 
         val cameraUpdate: CameraUpdate = CameraUpdateFactory.newCameraPosition(
             CameraPosition.builder().target(LatLng(latitude, longitude)).zoom(19f).build()
@@ -449,7 +449,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getUserStatus() {
-        ApiClient.instance.getUser(sharedPref.getString(Constant.PREF_USER_ID).toString())
+        ApiClient.instance.getUser(sharedPref.getString(Constant.PREF_USER_ID).toString(),"")
             .enqueue(object : Callback<DataResponse> {
                 override fun onResponse(
                     call: Call<DataResponse>,

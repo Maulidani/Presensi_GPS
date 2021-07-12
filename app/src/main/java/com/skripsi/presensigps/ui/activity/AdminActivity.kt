@@ -11,6 +11,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
 import com.skripsi.presensigps.model.DataResponse
@@ -19,6 +20,7 @@ import com.skripsi.presensigps.utils.Constant
 import com.skripsi.presensigps.utils.PreferencesHelper
 import kotlinx.android.synthetic.main.activity_admin.*
 import kotlinx.android.synthetic.main.activity_login.*
+import kotlinx.android.synthetic.main.activity_profile.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -45,11 +47,15 @@ class AdminActivity : AppCompatActivity() {
         progressDialog.setCancelable(false)
         progressDialog.show()
 
+        Glide.with(this)
+            .load(sharedPref.getString(Constant.PREF_USER_IMG))
+            .into(icFace)
         tvName.text = sharedPref.getString(Constant.PREF_USER_NAME).toString()
         tvPosition.text = sharedPref.getString(Constant.PREF_USER_POSITION).toString()
 
         if (sharedPref.getString(Constant.PREF_USER_POSITION)
-                .toString()=="manager") {
+                .toString() == "manager"
+        ) {
             cardUser.visibility = View.INVISIBLE
         }
         getInfoAdmin()
@@ -123,8 +129,13 @@ class AdminActivity : AppCompatActivity() {
         } else if (sharedPref.getString(Constant.PREF_USER_POSITION) == "sales") {
             finish()
         } else {
+            Glide.with(this)
+                .load(sharedPref.getString(Constant.PREF_USER_IMG))
+                .into(icFace)
+
             getInfoAdmin()
         }
+
     }
 
     private fun btnOnClick() {
@@ -142,14 +153,18 @@ class AdminActivity : AppCompatActivity() {
             startActivity(Intent(this, MapsInfoActivity::class.java))
         }
         cardUser.setOnClickListener {
-            if (sharedPref.getString(Constant.PREF_USER_POSITION)=="admin"){
-                startActivity(Intent(this, InfoActivity::class.java)
-                    .putExtra("type", "user")
-                    .putExtra("admin",true))
+            if (sharedPref.getString(Constant.PREF_USER_POSITION) == "admin") {
+                startActivity(
+                    Intent(this, InfoActivity::class.java)
+                        .putExtra("type", "user")
+                        .putExtra("admin", true)
+                )
             } else {
-                startActivity(Intent(this, InfoActivity::class.java)
-                    .putExtra("type", "user")
-                    .putExtra("admin",false))
+                startActivity(
+                    Intent(this, InfoActivity::class.java)
+                        .putExtra("type", "user")
+                        .putExtra("admin", false)
+                )
             }
         }
     }

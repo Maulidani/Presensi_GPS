@@ -31,6 +31,8 @@ import com.skripsi.presensigps.adapter.UserAdapter
 import com.skripsi.presensigps.model.DataResponse
 import com.skripsi.presensigps.model.Result
 import com.skripsi.presensigps.network.ApiClient
+import com.skripsi.presensigps.utils.Constant
+import com.skripsi.presensigps.utils.PreferencesHelper
 import kotlinx.android.synthetic.main.activity_info.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -47,6 +49,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapter.IUserRecycler {
+    private lateinit var sharedPref: PreferencesHelper
     private lateinit var lLayoutManager: LinearLayoutManager
     private lateinit var lLayoutManagerToday: LinearLayoutManager
     private lateinit var pAdapter: PresenceAdapter
@@ -81,10 +84,16 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
         "desember",
         "semua"
     )
+    private val itemYear = listOf(
+        "2021",
+        "2022",
+        "2023"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_info)
+        sharedPref = PreferencesHelper(this)
 
         type = intent.getStringExtra("type").toString()
         admin = intent.getBooleanExtra("admin", false)
@@ -103,7 +112,7 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
     private fun presence() {
         progressDialog.show()
 
-        ApiClient.instance.getUser("").enqueue(object : Callback<DataResponse> {
+        ApiClient.instance.getUser("", "sales").enqueue(object : Callback<DataResponse> {
             override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
                 val result = response.body()?.result
                 val value = response.body()?.value
@@ -282,7 +291,7 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
     private fun user() {
         progressDialog.show()
 
-        ApiClient.instance.getUser("").enqueue(object : Callback<DataResponse> {
+        ApiClient.instance.getUser("", "").enqueue(object : Callback<DataResponse> {
             override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
                 val value = response.body()?.value
                 var message = "Sukses"
@@ -333,63 +342,76 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
         })
     }
 
-    private fun printReport(whenReport: String, sWhen: String) {
+    private fun printReport(whenReport: String, sWhen: String, yearReport: String, sYear: String) {
         progressDialogCetak = ProgressDialog(this)
         progressDialogCetak.setTitle("Loading")
         progressDialogCetak.setMessage("Memuat Informasi...")
         progressDialogCetak.setCancelable(false)
         progressDialogCetak.show()
 
-        ApiClient.instance.getReportPDF(whenReport).enqueue(object : Callback<DataResponse> {
-            override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
-                val value = response.body()?.value
-                val result = response.body()?.result
-                var message = "Sukses"
+        ApiClient.instance.getReportPDF(whenReport, yearReport)
+            .enqueue(object : Callback<DataResponse> {
+                override fun onResponse(
+                    call: Call<DataResponse>,
+                    response: Response<DataResponse>
+                ) {
+                    val value = response.body()?.value
+                    val result = response.body()?.result
+                    var message = "Sukses"
 
-                if (value.equals("1")) {
-                    if (!result.isNullOrEmpty()) {
-                        if (whenReport == "today") {
-                            createPDF(result, whenReport, sWhen)
+                    if (value.equals("1")) {
+                        if (!result.isNullOrEmpty()) {
+                            if (whenReport == "today") {
+                                createPDF(result, whenReport, sWhen, sYear)
+                            } else {
+                                createPDF(result, whenReport, sWhen, sYear)
+                            }
                         } else {
-                            createPDF(result, whenReport, sWhen)
+                            snackbar =
+                                Snackbar.make(
+                                    parentInfoActivity,
+                                    "Belum ada laporan",
+                                    Snackbar.LENGTH_SHORT
+                                )
+                            snackbar.show()
+
+                            progressDialog.dismiss()
                         }
                     } else {
+                        message = "Gagal"
+
                         snackbar =
-                            Snackbar.make(
-                                parentInfoActivity,
-                                "Belum ada laporan",
-                                Snackbar.LENGTH_SHORT
-                            )
+                            Snackbar.make(parentInfoActivity, message, Snackbar.LENGTH_SHORT)
                         snackbar.show()
 
                         progressDialog.dismiss()
                     }
-                } else {
-                    message = "Gagal"
-
-                    snackbar =
-                        Snackbar.make(parentInfoActivity, message, Snackbar.LENGTH_SHORT)
-                    snackbar.show()
-
-                    progressDialog.dismiss()
+                    progressDialogCetak.dismiss()
+                    cardCetak.visibility = View.INVISIBLE
                 }
-                progressDialogCetak.dismiss()
-                cardCetak.visibility = View.INVISIBLE
-            }
 
-            override fun onFailure(call: Call<DataResponse>, t: Throwable) {
-                progressDialogCetak.dismiss()
-                snackbar =
-                    Snackbar.make(parentInfoActivity, t.message.toString(), Snackbar.LENGTH_SHORT)
-                snackbar.show()
-                cardCetak.visibility = View.INVISIBLE
-            }
+                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                    progressDialogCetak.dismiss()
+                    snackbar =
+                        Snackbar.make(
+                            parentInfoActivity,
+                            t.message.toString(),
+                            Snackbar.LENGTH_SHORT
+                        )
+                    snackbar.show()
+                    cardCetak.visibility = View.INVISIBLE
+                }
 
-        })
+            })
     }
 
     @SuppressLint("SimpleDateFormat")
-    private fun createPDF(result: ArrayList<Result>, whenReport: String, sWhen: String) {
+    private fun createPDF(
+        result: ArrayList<Result>,
+        whenReport: String,
+        sWhen: String,
+        sYear: String
+    ) {
         dateTime = Date()
 
         val pdfDocument = PdfDocument()
@@ -404,7 +426,7 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
         paint.textAlign = Paint.Align.LEFT
         paint.color = Color.BLACK
         paint.textSize = 35f
-        canvas.drawText("Nama: " + "Admin Lapi", 20f, 590f, paint)
+        canvas.drawText("Nama: " + sharedPref.getString(Constant.PREF_USER_NAME), 20f, 590f, paint)
 
         paint.textAlign = Paint.Align.RIGHT
         dateFormat = SimpleDateFormat("dd/MM/yy")
@@ -423,7 +445,7 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
         )
 
         canvas.drawText(
-            "laporan: $sWhen",
+            "laporan: $sWhen, $sYear",
             (pageWidth - 20).toFloat(),
             690f,
             paint
@@ -441,7 +463,7 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
         if (whenReport == "today") {
             canvas.drawText("No.", 40f, 830f, paint)
             canvas.drawText("Nama", 150f, 830f, paint)
-            canvas.drawText("Datang", 700f, 830f, paint)
+            canvas.drawText("Melapor", 700f, 830f, paint)
             canvas.drawText("Ket.", 1050f, 830f, paint)
             canvas.drawLine(130f, 790f, 130f, 840f, paint)
             canvas.drawLine(680f, 790f, 680f, 840f, paint)
@@ -460,7 +482,7 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
         } else {
             canvas.drawText("No.", 40f, 830f, paint)
             canvas.drawText("Nama", 150f, 830f, paint)
-            canvas.drawText("Jumlah Hadir", 700f, 830f, paint)
+            canvas.drawText("Jumlah Laporan", 700f, 830f, paint)
             canvas.drawText("Ket.", 1050f, 830f, paint)
             canvas.drawLine(130f, 790f, 130f, 840f, paint)
             canvas.drawLine(680f, 790f, 680f, 840f, paint)
@@ -520,6 +542,8 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
 
                 val adapterCetak = ArrayAdapter(this, R.layout.list_dropdown, itemCetak)
                 inputCetak.setAdapter(adapterCetak)
+                val adapterYear = ArrayAdapter(this, R.layout.list_dropdown, itemYear)
+                inputYear.setAdapter(adapterYear)
 
                 rvToday.visibility = View.VISIBLE
                 tvCetak.visibility = View.VISIBLE
@@ -554,9 +578,19 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
                         "desember" -> whenReport = "12"
                         "semua" -> whenReport = ""
                     }
+                    val sYear = inputYear.text.toString()
+                    var yearReport = ""
+                    when (sYear) {
+                        "2021" -> yearReport = "21"
+                        "2022" -> yearReport = "22"
+                        "2023" -> yearReport = "23"
+                    }
 
-                    if (sWhen == "") inputCetak.error = "Pilih terlebih dahulu"
-                    else printReport(whenReport, sWhen)
+                    when {
+                        sWhen == "" -> inputCetak.error = "Pilih terlebih dahulu"
+                        sYear == "" -> inputYear.error = "Pilih terlebih dahulu"
+                        else -> printReport(whenReport, sWhen, yearReport, sYear)
+                    }
                 }
             }
             "user" -> {

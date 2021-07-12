@@ -30,7 +30,7 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var progressDialog: ProgressDialog
 
     //    private var latLngList = ArrayList<LatLng>()
-//    private var locationNameList = ArrayList<String>()
+    //    private var locationNameList = ArrayList<String>()
     private lateinit var latLngLocation: LatLng
     private lateinit var cameraUpdate: CameraUpdate
 
@@ -44,7 +44,7 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps_info)
-        supportActionBar?.title = "Laporan"
+        supportActionBar?.title = "Laporan Hari Ini"
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         check = intent.getBooleanExtra("cek", false)
@@ -135,13 +135,21 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun getReportLatLnt() {
         progressDialog.show()
 
-        ApiClient.instance.getReport("").enqueue(object : Callback<DataResponse> {
+        ApiClient.instance.getReport("today").enqueue(object : Callback<DataResponse> {
             override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
+                val result = response.body()?.result
                 val value = response.body()?.value
-                var message = "Sukses"
+                var message = "Belum ada laporan hari ini"
 
                 if (value.equals("1")) {
-                    for (i in response.body()!!.result) {
+
+                    if (result.isNullOrEmpty()) {
+                        snackbar =
+                            Snackbar.make(parentMapsInfoActivity, message, Snackbar.LENGTH_SHORT)
+                        snackbar.show()
+                    }
+
+                    for (i in result!!) {
 //                        latLngList.add(
 //                            LatLng(
 //                                i.latitude.toDouble(),

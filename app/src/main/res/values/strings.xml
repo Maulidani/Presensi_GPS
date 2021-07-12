@@ -53,6 +53,7 @@
     <string name="semua">Semua</string>
     <string name="tidak_ada_laporan_hari_ini">Tidak Ada Laporan Hari ini</string>
     <string name="cetak">Cetak</string>
+    <string name="tahun">Tahun</string>
     <string-array name="menu_spinner">
         <item>Pilih Kopi</item>
         <item>Kopi SOE</item>

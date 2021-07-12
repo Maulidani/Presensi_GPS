@@ -74,8 +74,9 @@ class LoginActivity : AppCompatActivity() {
                         val positionUser = response.body()?.position
                         val emailUser = response.body()?.email
                         val passwordUser = response.body()?.password
+                        val imgUser = response.body()?.img
 
-                        saveSession(idUser, nameUser, positionUser, emailUser, passwordUser)
+                        saveSession(idUser, nameUser, positionUser, emailUser, passwordUser, imgUser)
 
                         when (positionUser) {
                             "admin" -> {
@@ -153,13 +154,15 @@ class LoginActivity : AppCompatActivity() {
         nameUser: String?,
         positionUser: String?,
         emailUser: String?,
-        passwordUser: String?
+        passwordUser: String?,
+        imgUser: String?
     ) {
         sharedPref.put(Constant.PREF_USER_ID, idUser.toString())
         sharedPref.put(Constant.PREF_USER_NAME, nameUser.toString())
         sharedPref.put(Constant.PREF_USER_POSITION, positionUser.toString())
         sharedPref.put(Constant.PREF_USER_EMAIL, emailUser.toString())
         sharedPref.put(Constant.PREF_USER_PASSWORD, passwordUser.toString())
+        sharedPref.put(Constant.PREF_USER_IMG, imgUser.toString())
         sharedPref.put(Constant.PREF_IS_LOGIN, true)
     }
 
@@ -189,7 +192,7 @@ class LoginActivity : AppCompatActivity() {
                         response.body()?.radius.toString()
                     )
 
-                    Toast.makeText(this@LoginActivity, message.toString(), Toast.LENGTH_SHORT)
+                    Toast.makeText(this@LoginActivity, "Mendapatkan Lokasi", Toast.LENGTH_SHORT)
                         .show()
 
                     startActivity(Intent(this@LoginActivity, MapsActivity::class.java))

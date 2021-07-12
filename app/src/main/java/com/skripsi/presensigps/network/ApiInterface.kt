@@ -94,7 +94,8 @@ interface ApiInterface {
 
     @GET("get_user.php")
     fun getUser(
-        @Query("id") id: String
+        @Query("id") id: String,
+        @Query("position") position: String
     ): Call<DataResponse>
 
     @GET("get_detail_presence.php")
@@ -104,7 +105,8 @@ interface ApiInterface {
 
     @GET("get_report_for_pdf.php")
     fun getReportPDF(
-        @Query("when") sWhen: String
+        @Query("when") sWhen: String,
+        @Query("year") sYear: String
     ): Call<DataResponse>
 
     @FormUrlEncoded
@@ -112,5 +114,12 @@ interface ApiInterface {
     fun delete(
         @Field("id") id: String,
         @Field("type") type: String
+    ): Call<DataResponse>
+
+    @FormUrlEncoded
+    @POST("up_img_user.php")
+    fun upImg(
+        @Field("id") id: String,
+        @Field("img") img: String
     ): Call<DataResponse>
 }
