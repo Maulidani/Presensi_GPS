@@ -46,6 +46,7 @@ data class Result(
     val notes: String,
     val img: String,
     val date: String,
+    val currentDate: String,
     val time: String,
     val status: String,
 

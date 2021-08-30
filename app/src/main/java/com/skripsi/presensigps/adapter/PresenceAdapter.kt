@@ -26,7 +26,7 @@ class PresenceAdapter(
 
             sharedPref = PreferencesHelper(itemView.context)
 
-            if (dataResult.status == "1") {
+            if (dataResult.currentDate == dataResult.date) {
                 itemView.icStatus.setImageResource(R.drawable.ic_success)
             } else {
                 itemView.icStatus.setImageResource(R.drawable.ic_success_not_yet)
@@ -39,6 +39,8 @@ class PresenceAdapter(
                     Intent(itemView.context, DetailPresenceActivity::class.java)
                         .putExtra("id", dataResult.id)
                         .putExtra("name", dataResult.name)
+                        .putExtra("date", dataResult.date)
+                        .putExtra("currentDate", dataResult.currentDate)
                 )
             }
 

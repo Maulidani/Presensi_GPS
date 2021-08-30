@@ -3,6 +3,7 @@
 package com.skripsi.presensigps.ui.activity
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -81,6 +82,12 @@ class MapsInfoActivity : AppCompatActivity(), OnMapReadyCallback {
             } else {
                 btnVerifikasi.text = getString(R.string.verifikasi)
                 btnVerifikasi.setTextColor(Color.BLACK)
+            }
+
+            imgReport.setOnClickListener {
+                startActivity(
+                    Intent(this, DetailImageActivity::class.java)
+                        .putExtra("img", img))
             }
         }
 

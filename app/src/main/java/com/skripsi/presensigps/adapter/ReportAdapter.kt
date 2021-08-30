@@ -47,6 +47,7 @@ class ReportAdapter(
             Glide.with(itemView)
                 .load(dataResult.img)
                 .into(itemView.imgReport)
+
             itemView.tvLocation.text = dataResult.location_name
             itemView.tvLatitude.text = dataResult.latitude
             itemView.tvLongitude.text = dataResult.longitude

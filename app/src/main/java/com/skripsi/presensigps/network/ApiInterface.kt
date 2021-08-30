@@ -109,6 +109,12 @@ interface ApiInterface {
         @Query("year") sYear: String
     ): Call<DataResponse>
 
+    @GET("get_presence_for_pdf.php")
+    fun getPresencePDF(
+        @Query("when") sWhen: String,
+        @Query("year") sYear: String
+    ): Call<DataResponse>
+
     @FormUrlEncoded
     @POST("delete.php")
     fun delete(

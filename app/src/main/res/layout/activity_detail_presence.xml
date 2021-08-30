@@ -82,7 +82,7 @@
                 android:layout_height="0dp"
                 android:background="@color/white"
                 android:gravity="center"
-                android:text="Belum Melakukan Presensi"
+                android:text="Belum Melakukan Presensi Hari ini"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>

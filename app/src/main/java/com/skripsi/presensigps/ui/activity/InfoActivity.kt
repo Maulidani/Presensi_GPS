@@ -342,7 +342,82 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
         })
     }
 
-    private fun printReport(whenReport: String, sWhen: String, yearReport: String, sYear: String) {
+    private fun printPresence(
+        whenReport: String,
+        sWhen: String,
+        yearReport: String,
+        sYear: String,
+        type: String
+    ) {
+        progressDialogCetak = ProgressDialog(this)
+        progressDialogCetak.setTitle("Loading")
+        progressDialogCetak.setMessage("Memuat Informasi...")
+        progressDialogCetak.setCancelable(false)
+        progressDialogCetak.show()
+
+        ApiClient.instance.getPresencePDF(whenReport, yearReport)
+            .enqueue(object : Callback<DataResponse> {
+                override fun onResponse(
+                    call: Call<DataResponse>,
+                    response: Response<DataResponse>
+                ) {
+                    val value = response.body()?.value
+                    val result = response.body()?.result
+                    var message = "Sukses"
+
+                    if (value.equals("1")) {
+                        if (!result.isNullOrEmpty()) {
+                            if (whenReport == "today") {
+                                createPDF(result, whenReport, sWhen, sYear, type)
+                            } else {
+                                createPDF(result, whenReport, sWhen, sYear, type)
+                            }
+                        } else {
+                            snackbar =
+                                Snackbar.make(
+                                    parentInfoActivity,
+                                    "Belum ada laporan",
+                                    Snackbar.LENGTH_SHORT
+                                )
+                            snackbar.show()
+
+                            progressDialog.dismiss()
+                        }
+                    } else {
+                        message = "Gagal"
+
+                        snackbar =
+                            Snackbar.make(parentInfoActivity, message, Snackbar.LENGTH_SHORT)
+                        snackbar.show()
+
+                        progressDialog.dismiss()
+                    }
+                    progressDialogCetak.dismiss()
+                    cardCetak.visibility = View.INVISIBLE
+                }
+
+                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
+                    progressDialogCetak.dismiss()
+                    snackbar =
+                        Snackbar.make(
+                            parentInfoActivity,
+                            t.message.toString(),
+                            Snackbar.LENGTH_SHORT
+                        )
+                    snackbar.show()
+                    cardCetak.visibility = View.INVISIBLE
+                }
+
+            })
+    }
+
+    private fun printReport(
+        whenReport: String,
+        sWhen: String,
+        yearReport: String,
+        sYear: String,
+        type: String
+    ) {
         progressDialogCetak = ProgressDialog(this)
         progressDialogCetak.setTitle("Loading")
         progressDialogCetak.setMessage("Memuat Informasi...")
@@ -362,9 +437,9 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
                     if (value.equals("1")) {
                         if (!result.isNullOrEmpty()) {
                             if (whenReport == "today") {
-                                createPDF(result, whenReport, sWhen, sYear)
+                                createPDF(result, whenReport, sWhen, sYear, type)
                             } else {
-                                createPDF(result, whenReport, sWhen, sYear)
+                                createPDF(result, whenReport, sWhen, sYear, type)
                             }
                         } else {
                             snackbar =
@@ -410,7 +485,8 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
         result: ArrayList<Result>,
         whenReport: String,
         sWhen: String,
-        sYear: String
+        sYear: String,
+        type: String
     ) {
         dateTime = Date()
 
@@ -444,12 +520,21 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
             paint
         )
 
-        canvas.drawText(
-            "laporan: $sWhen, $sYear",
-            (pageWidth - 20).toFloat(),
-            690f,
-            paint
-        )
+        if (type == "report") {
+            canvas.drawText(
+                "laporan: $sWhen, $sYear",
+                (pageWidth - 20).toFloat(),
+                690f,
+                paint
+            )
+        } else if (type == "presence") {
+            canvas.drawText(
+                "Presensi Kehadiran: $sWhen, $sYear",
+                (pageWidth - 20).toFloat(),
+                690f,
+                paint
+            )
+        }
 
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = 2f
@@ -460,90 +545,185 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
 
         var y = 950
 
-        if (whenReport == "today") {
-            canvas.drawText("No.", 40f, 830f, paint)
-            canvas.drawText("Nama", 150f, 830f, paint)
-            canvas.drawText("Melapor", 700f, 830f, paint)
-            canvas.drawText("Ket.", 1050f, 830f, paint)
-            canvas.drawLine(130f, 790f, 130f, 840f, paint)
-            canvas.drawLine(680f, 790f, 680f, 840f, paint)
-            canvas.drawLine(1030f, 790f, 1030f, 840f, paint)
+        if (type == "report") {
+            if (whenReport == "today") {
+                canvas.drawText("No.", 40f, 830f, paint)
+                canvas.drawText("Nama", 150f, 830f, paint)
+                canvas.drawText("Melapor", 700f, 830f, paint)
+                canvas.drawText("Ket.", 1050f, 830f, paint)
+                canvas.drawLine(130f, 790f, 130f, 840f, paint)
+                canvas.drawLine(680f, 790f, 680f, 840f, paint)
+                canvas.drawLine(1030f, 790f, 1030f, 840f, paint)
 
-            var no = 1
-            for (i in result) {
-                canvas.drawText(no.toString(), 40f, y.toFloat(), paint)
-                canvas.drawText(i.name, 150f, y.toFloat(), paint)
-                canvas.drawText(i.time, 700f, y.toFloat(), paint)
-                canvas.drawText("--", 1100f, y.toFloat(), paint)
+                var no = 1
+                for (i in result) {
+                    canvas.drawText(no.toString(), 40f, y.toFloat(), paint)
+                    canvas.drawText(i.name, 150f, y.toFloat(), paint)
+                    canvas.drawText(i.time, 700f, y.toFloat(), paint)
+                    canvas.drawText("--", 1100f, y.toFloat(), paint)
 
-                no += 1
-                y += 100
+                    no += 1
+                    y += 100
+                }
+            } else {
+                canvas.drawText("No.", 40f, 830f, paint)
+                canvas.drawText("Nama", 150f, 830f, paint)
+                canvas.drawText("Jumlah Laporan", 700f, 830f, paint)
+                canvas.drawText("Ket.", 1050f, 830f, paint)
+                canvas.drawLine(130f, 790f, 130f, 840f, paint)
+                canvas.drawLine(680f, 790f, 680f, 840f, paint)
+                canvas.drawLine(1030f, 790f, 1030f, 840f, paint)
+
+                var no = 1
+                for (i in result) {
+                    canvas.drawText(no.toString(), 40f, y.toFloat(), paint)
+                    canvas.drawText(i.name, 150f, y.toFloat(), paint)
+                    canvas.drawText(i.jumlah, 700f, y.toFloat(), paint)
+                    canvas.drawText("--", 1100f, y.toFloat(), paint)
+
+                    no += 1
+                    y += 100
+                }
+
             }
-        } else {
-            canvas.drawText("No.", 40f, 830f, paint)
-            canvas.drawText("Nama", 150f, 830f, paint)
-            canvas.drawText("Jumlah Laporan", 700f, 830f, paint)
-            canvas.drawText("Ket.", 1050f, 830f, paint)
-            canvas.drawLine(130f, 790f, 130f, 840f, paint)
-            canvas.drawLine(680f, 790f, 680f, 840f, paint)
-            canvas.drawLine(1030f, 790f, 1030f, 840f, paint)
+        } else if (type == "presence") {
 
-            var no = 1
-            for (i in result) {
-                canvas.drawText(no.toString(), 40f, y.toFloat(), paint)
-                canvas.drawText(i.name, 150f, y.toFloat(), paint)
-                canvas.drawText(i.jumlah, 700f, y.toFloat(), paint)
-                canvas.drawText("--", 1100f, y.toFloat(), paint)
+            if (whenReport == "today") {
+                canvas.drawText("No.", 40f, 830f, paint)
+                canvas.drawText("Nama", 150f, 830f, paint)
+                canvas.drawText("Presensi", 700f, 830f, paint)
+                canvas.drawText("Ket.", 1050f, 830f, paint)
+                canvas.drawLine(130f, 790f, 130f, 840f, paint)
+                canvas.drawLine(680f, 790f, 680f, 840f, paint)
+                canvas.drawLine(1030f, 790f, 1030f, 840f, paint)
 
-                no += 1
-                y += 100
+                var no = 1
+                for (i in result) {
+                    canvas.drawText(no.toString(), 40f, y.toFloat(), paint)
+                    canvas.drawText(i.name, 150f, y.toFloat(), paint)
+                    canvas.drawText(i.time, 700f, y.toFloat(), paint)
+                    canvas.drawText("--", 1100f, y.toFloat(), paint)
+
+                    no += 1
+                    y += 100
+                }
+            } else {
+                canvas.drawText("No.", 40f, 830f, paint)
+                canvas.drawText("Nama", 150f, 830f, paint)
+                canvas.drawText("Jumlah Kehadiran", 700f, 830f, paint)
+                canvas.drawText("Ket.", 1050f, 830f, paint)
+                canvas.drawLine(130f, 790f, 130f, 840f, paint)
+                canvas.drawLine(680f, 790f, 680f, 840f, paint)
+                canvas.drawLine(1030f, 790f, 1030f, 840f, paint)
+
+                var no = 1
+                for (i in result) {
+                    canvas.drawText(no.toString(), 40f, y.toFloat(), paint)
+                    canvas.drawText(i.name, 150f, y.toFloat(), paint)
+                    canvas.drawText(i.jumlah, 700f, y.toFloat(), paint)
+                    canvas.drawText("--", 1100f, y.toFloat(), paint)
+
+                    no += 1
+                    y += 100
+                }
+
             }
-
         }
 
         pdfDocument.finishPage(page)
         val date = SimpleDateFormat("dd_MM_yy")
         val time = SimpleDateFormat("HH_mm_ss")
 
-        val file = File(
-            Environment.getExternalStorageDirectory(),
-            "/sales_laporan_tgl_${date.format(dateTime)}_pkl_${time.format(dateTime)}.pdf"
-        )
+        var file:File? = null
+        if (type == "report") {
+            file = File(
+                Environment.getExternalStorageDirectory(),
+                "Download/laporan_sales_tgl_${date.format(dateTime)}_pkl_${time.format(dateTime)}.pdf"
+//            "/sales_laporan_tgl_${date.format(dateTime)}_pkl_${time.format(dateTime)}.pdf"
+            )
+        } else if (type == "presence") {
+
+            file = File(
+                Environment.getExternalStorageDirectory(),
+                "Download/presensi_sales_tgl_${date.format(dateTime)}_pkl_${time.format(dateTime)}.pdf"
+            )
+        }
 
         try {
             pdfDocument.writeTo(FileOutputStream(file))
+            Toast.makeText(this, "cetak pdf tersimpan di folder Download", Toast.LENGTH_LONG)
+                .show()
         } catch (e: IOException) {
+            Toast.makeText(this, "Gagal cetak laporan", Toast.LENGTH_LONG).show()
             e.printStackTrace()
         }
 
         pdfDocument.close()
-        Toast.makeText(this, "Periksa file manager anda", Toast.LENGTH_LONG).show()
     }
 
     override fun onStart() {
         super.onStart()
+        bitmap = BitmapFactory.decodeResource(resources, R.drawable.logo_header)
+        scaleBitmap = Bitmap.createScaledBitmap(bitmap, pageWidth, 518, false)
+
+        ActivityCompat.requestPermissions(
+            this, arrayOf(
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ), PackageManager.PERMISSION_GRANTED
+        )
+
+        val adapterCetak = ArrayAdapter(this, R.layout.list_dropdown, itemCetak)
+        inputCetak.setAdapter(adapterCetak)
+        val adapterYear = ArrayAdapter(this, R.layout.list_dropdown, itemYear)
+        inputYear.setAdapter(adapterYear)
 
         when (type) {
             "presence" -> {
                 supportActionBar?.title = "Presensi"
+                tvToday.visibility = View.VISIBLE
+                tvCetak.visibility = View.VISIBLE
                 presence()
+
+                tvCetak.setOnClickListener {
+                    cardCetak.visibility = View.VISIBLE
+                }
+
+                btnCetak.setOnClickListener {
+                    val sWhen = inputCetak.text.toString()
+                    var whenReport = ""
+                    when (sWhen) {
+                        "hari ini" -> whenReport = "today"
+                        "januari" -> whenReport = "01"
+                        "februari" -> whenReport = "02"
+                        "maret" -> whenReport = "03"
+                        "april" -> whenReport = "04"
+                        "mei" -> whenReport = "05"
+                        "juni" -> whenReport = "06"
+                        "juli" -> whenReport = "07"
+                        "agustus" -> whenReport = "08"
+                        "september" -> whenReport = "09"
+                        "oktober" -> whenReport = "10"
+                        "november" -> whenReport = "11"
+                        "desember" -> whenReport = "12"
+                        "semua" -> whenReport = ""
+                    }
+                    val sYear = inputYear.text.toString()
+                    var yearReport = ""
+                    when (sYear) {
+                        "2021" -> yearReport = "21"
+                        "2022" -> yearReport = "22"
+                        "2023" -> yearReport = "23"
+                    }
+
+                    when {
+                        sWhen == "" -> inputCetak.error = "Pilih terlebih dahulu"
+                        sYear == "" -> inputYear.error = "Pilih terlebih dahulu"
+                        else -> printPresence(whenReport, sWhen, yearReport, sYear, "presence")
+                    }
+                }
             }
             "report" -> {
-                bitmap = BitmapFactory.decodeResource(resources, R.drawable.logo_header)
-                scaleBitmap = Bitmap.createScaledBitmap(bitmap, pageWidth, 518, false)
-
-                ActivityCompat.requestPermissions(
-                    this, arrayOf(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    ), PackageManager.PERMISSION_GRANTED
-                )
-
                 supportActionBar?.title = "Laporan"
-
-                val adapterCetak = ArrayAdapter(this, R.layout.list_dropdown, itemCetak)
-                inputCetak.setAdapter(adapterCetak)
-                val adapterYear = ArrayAdapter(this, R.layout.list_dropdown, itemYear)
-                inputYear.setAdapter(adapterYear)
 
                 rvToday.visibility = View.VISIBLE
                 tvCetak.visibility = View.VISIBLE
@@ -589,7 +769,7 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
                     when {
                         sWhen == "" -> inputCetak.error = "Pilih terlebih dahulu"
                         sYear == "" -> inputYear.error = "Pilih terlebih dahulu"
-                        else -> printReport(whenReport, sWhen, yearReport, sYear)
+                        else -> printReport(whenReport, sWhen, yearReport, sYear, "report")
                     }
                 }
             }
