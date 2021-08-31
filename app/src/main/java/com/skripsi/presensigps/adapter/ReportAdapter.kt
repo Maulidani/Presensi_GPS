@@ -38,8 +38,10 @@ class ReportAdapter(
             sharedPref = PreferencesHelper(itemView.context)
             positions = sharedPref.getString(Constant.PREF_USER_POSITION)
 
-            if (positions == "manager") {
+            if (positions == "manager" || positions == "sales") {
                 itemView.btnVerifikasi.visibility = View.INVISIBLE
+            }else {
+                itemView.btnVerifikasi.visibility = View.VISIBLE
             }
 
             itemView.tvName.text = dataResult.name

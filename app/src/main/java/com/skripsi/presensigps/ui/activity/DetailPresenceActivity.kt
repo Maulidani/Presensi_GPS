@@ -15,6 +15,7 @@ import com.skripsi.presensigps.R
 import com.skripsi.presensigps.model.DataResponse
 import com.skripsi.presensigps.network.ApiClient
 import kotlinx.android.synthetic.main.activity_detail_presence.*
+import kotlinx.android.synthetic.main.fragment_history2.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -37,40 +38,28 @@ class DetailPresenceActivity : AppCompatActivity() {
         val idName = intent.getStringExtra("id")
         val date = intent.getStringExtra("date")
         val currentdate = intent.getStringExtra("currentDate")
+        val today = intent.getStringExtra("today")
         name = intent.getStringExtra("name")
 
         supportActionBar?.title = name
 
-        getDetail(idName.toString(), date.toString(), currentdate.toString())
+        getDetail(idName.toString(), date.toString(), currentdate.toString(), today.toString())
 
     }
 
-    private fun getDetail(id: String, date: String, currentDate: String) {
+    private fun getDetail(id: String, date: String, currentDate: String, today: String) {
         progressDialog.show()
 
-        ApiClient.instance.getDetailPresence(id).enqueue(object : Callback<DataResponse> {
-            @SuppressLint("CheckResult")
+        ApiClient.instance.getDetailPresence(id,today).enqueue(object : Callback<DataResponse> {
             override fun onResponse(call: Call<DataResponse>, response: Response<DataResponse>) {
                 val value = response.body()?.value
+                val history = response.body()?.history
 
-                val requestOptions = RequestOptions()
-                requestOptions.placeholder(R.drawable.ic_face)
+                if (value.equals("1") && date == currentDate) {
+                    onResponseSuccess(response.body()!!)
 
-                if (value == "1" && date == currentDate) {
-                    Glide.with(this@DetailPresenceActivity)
-                        .setDefaultRequestOptions(requestOptions)
-                        .load(response.body()?.img.toString())
-                        .into(imgPresence)
-                    tvName2.text = name
-                    tvDate.text = response.body()?.date
-                    tvTime.text = response.body()?.time
-                    tvNotPresensi.visibility = View.INVISIBLE
-
-                    imgPresence.setOnClickListener {
-                        startActivity(
-                            Intent(this@DetailPresenceActivity, DetailImageActivity::class.java)
-                            .putExtra("img", response.body()?.img.toString()))
-                    }
+                } else if (history.equals("1")){
+                    onResponseSuccess(response.body()!!)
                 }
                 progressDialog.dismiss()
             }
@@ -82,9 +71,31 @@ class DetailPresenceActivity : AppCompatActivity() {
                     Snackbar.LENGTH_SHORT
                 )
                 snackbar.show()
+                progressDialog.dismiss()
             }
-
         })
+    }
+
+    @SuppressLint("CheckResult")
+    private fun onResponseSuccess(body: DataResponse) {
+
+       val requestOptions = RequestOptions()
+       requestOptions.placeholder(R.drawable.ic_face)
+
+       Glide.with(this@DetailPresenceActivity)
+           .setDefaultRequestOptions(requestOptions)
+           .load(body.img)
+           .into(imgPresence)
+       tvName2.text = name
+       tvDate.text = body.date
+       tvTime.text = body.time
+       tvNotPresensi.visibility = View.INVISIBLE
+
+       imgPresence.setOnClickListener {
+           startActivity(
+               Intent(this@DetailPresenceActivity, DetailImageActivity::class.java)
+                   .putExtra("img", body.img.toString()))
+       }
     }
 
     override fun onSupportNavigateUp(): Boolean {

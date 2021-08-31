@@ -376,7 +376,7 @@ class InfoActivity : AppCompatActivity(), ReportAdapter.IUserRecycler, UserAdapt
                             snackbar =
                                 Snackbar.make(
                                     parentInfoActivity,
-                                    "Belum ada laporan",
+                                    "Belum ada presensi",
                                     Snackbar.LENGTH_SHORT
                                 )
                             snackbar.show()

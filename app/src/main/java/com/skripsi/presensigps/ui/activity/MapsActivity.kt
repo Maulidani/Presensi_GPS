@@ -305,7 +305,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 //        }
 
         val circleOptions = CircleOptions()
-        circleOptions.center(officeLocation)
+        if (officeLocation != null) {
+            circleOptions.center(officeLocation)
+        } else {
+            circleOptions.center(myLocation)
+        }
         circleOptions.radius(radius)
         circleOptions.fillColor(0x30ff0000)
         circleOptions.strokeWidth(5f)
@@ -452,7 +456,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getUserStatus() {
-        ApiClient.instance.getUser(sharedPref.getString(Constant.PREF_USER_ID).toString(),"")
+        ApiClient.instance.getUser(sharedPref.getString(Constant.PREF_USER_ID).toString(), "")
             .enqueue(object : Callback<DataResponse> {
                 override fun onResponse(
                     call: Call<DataResponse>,
@@ -713,12 +717,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater: MenuInflater = menuInflater
-        inflater.inflate(R.menu.profile_menu, menu)
+        inflater.inflate(R.menu.menu_sales, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            R.id.itemHistory -> {
+                startActivity(Intent(this, HistorySalesActivity::class.java))
+                return true
+            }
             R.id.itemProfile -> {
                 startActivity(Intent(this, ProfileActivity::class.java))
                 return true

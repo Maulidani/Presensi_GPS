@@ -7,4 +7,23 @@
     android:paddingHorizontal="24dp"
     tools:context=".ui.activity.AboutActivity">
 
+
+    <TextView
+
+        android:id="@+id/tvAppName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="Presensi GPS"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Version 1.0"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@id/tvAppName" />
 </androidx.constraintlayout.widget.ConstraintLayout>

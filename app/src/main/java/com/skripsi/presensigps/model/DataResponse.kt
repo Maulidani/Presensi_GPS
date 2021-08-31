@@ -2,6 +2,7 @@ package com.skripsi.presensigps.model
 
 data class DataResponse(
     val value: String,
+    val history: String,
     val message: String,
 
     //response login
@@ -51,6 +52,8 @@ data class Result(
     val status: String,
 
     val jumlah: String,
+
+    val history: String,
 
     var expendable: Boolean = false
 )

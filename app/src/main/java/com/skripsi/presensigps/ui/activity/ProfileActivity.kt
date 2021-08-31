@@ -20,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.snackbar.Snackbar
 import com.skripsi.presensigps.R
 import com.skripsi.presensigps.model.DataResponse
@@ -53,7 +54,11 @@ class ProfileActivity : AppCompatActivity() {
 
         sharedPref = PreferencesHelper(this)
 
+        val requestOptions = RequestOptions()
+        requestOptions.placeholder(R.drawable.ic_face)
+
         Glide.with(this@ProfileActivity)
+            .setDefaultRequestOptions(requestOptions)
             .load(sharedPref.getString(Constant.PREF_USER_IMG))
             .into(imgProfile)
         profileName.setText(sharedPref.getString(Constant.PREF_USER_NAME))

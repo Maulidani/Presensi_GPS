@@ -21,8 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PresensiGPS"
         android:usesCleartextTraffic="true">
-        <activity android:name=".ui.activity.DetailImageActivity"></activity>
-        <activity android:name=".ui.activity.PDFReportActivity"></activity>
+        <activity android:name=".ui.activity.HistorySalesActivity"></activity>
+        <activity android:name=".ui.activity.DetailImageActivity" />
+        <activity android:name=".ui.activity.PDFReportActivity" />
         <activity android:name=".ui.activity.DetailPresenceActivity" />
 
         <meta-data

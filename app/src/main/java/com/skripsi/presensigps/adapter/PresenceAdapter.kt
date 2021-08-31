@@ -25,8 +25,11 @@ class PresenceAdapter(
         fun bind(dataResult: Result) {
 
             sharedPref = PreferencesHelper(itemView.context)
-
+            var today = ""
             if (dataResult.currentDate == dataResult.date) {
+                itemView.icStatus.setImageResource(R.drawable.ic_success)
+                today = "today"
+            } else if (dataResult.history == "1") {
                 itemView.icStatus.setImageResource(R.drawable.ic_success)
             } else {
                 itemView.icStatus.setImageResource(R.drawable.ic_success_not_yet)
@@ -41,6 +44,7 @@ class PresenceAdapter(
                         .putExtra("name", dataResult.name)
                         .putExtra("date", dataResult.date)
                         .putExtra("currentDate", dataResult.currentDate)
+                        .putExtra("today", today)
                 )
             }
 

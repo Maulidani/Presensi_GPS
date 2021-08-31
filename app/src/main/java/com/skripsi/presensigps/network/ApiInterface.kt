@@ -70,8 +70,11 @@ interface ApiInterface {
     @GET("office_location.php")
     fun getOfficeLocation(): Call<DataResponse>
 
-    //    @GET("get_presence.php")
-//    fun getPresence(): Call<DataResponse>
+    @GET("get_presence_report.php")
+    fun getPresenceReport(
+        @Query("id") id: String,
+        @Query("item") item: String
+    ): Call<DataResponse>
 
     @FormUrlEncoded
     @POST("presence_back.php")
@@ -100,7 +103,8 @@ interface ApiInterface {
 
     @GET("get_detail_presence.php")
     fun getDetailPresence(
-        @Query("name") id: String
+        @Query("name") id: String,
+        @Query("today") today: String
     ): Call<DataResponse>
 
     @GET("get_report_for_pdf.php")
